@@ -8,11 +8,18 @@
 // Output: Footer component
 // *********************
 
+"use client";
+
 import { navigation } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 const Footer = () => {
+  const pathname = usePathname();
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
   return (
     <footer className="bg-white" aria-labelledby="footer-heading">
       <div>
