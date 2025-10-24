@@ -1,36 +1,115 @@
-// *********************
-// Role of the component: IntroducingSection with the text "Introducing Singitronic"
-// Name of the component: IntroducingSection.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <IntroducingSection />
-// Input parameters: no input parameters
-// Output: Section with the text "Introducing Singitronic" and button
-// *********************
-
-import Link from "next/link";
+"use client";
 import React from "react";
+import Image from "next/image";
+import { Heart, ShoppingCart } from "lucide-react";
+
+// Use only images that exist in /public to avoid 404s
+const products = [
+  {
+    id: 1,
+    name: "Smart Watch",
+    price: "₹2,499",
+    image: "/watch for banner.png",
+  },
+  {
+    id: 2,
+    name: "Wireless Earbuds",
+    price: "₹1,799",
+    image: "/earbuds 1.png",
+  },
+  {
+    id: 3,
+    name: "Gaming Headset",
+    price: "₹3,299",
+    image: "/headphones 1.png",
+  },
+  {
+    id: 4,
+    name: "Bluetooth Speaker",
+    price: "₹2,099",
+    image: "/sony speaker image.png",
+  },
+  {
+    id: 5,
+    name: "Smartphone",
+    price: "₹19,999",
+    image: "/smart phone 1.png",
+  },
+  {
+    id: 6,
+    name: "Laptop",
+    price: "₹49,999",
+    image: "/laptop 1.webp",
+  },
+  {
+    id: 7,
+    name: "Smart LED TV",
+    price: "₹25,999",
+    image: "/tv.jpg",
+  },
+  {
+    id: 8,
+    name: "Tablet",
+    price: "₹12,499",
+    image: "/tablet 1 1.png",
+  },
+];
 
 const IntroducingSection = () => {
   return (
-    <div className="py-20 pt-24 bg-gradient-to-l from-white to-blue-600">
-      <div className="text-center flex flex-col gap-y-5 items-center">
-        <h2 className="text-white text-8xl font-extrabold text-center mb-2 max-md:text-6xl max-[480px]:text-4xl">
-          INTRODUCING <span className="text-black">SINGI</span><span className="text-blue-600">TRONIC</span>
+    <section className="py-20 bg-white relative">
+      {/* Section Header */}
+      <div className="text-center mb-12">
+        <h2 className="text-5xl font-extrabold text-black-700 max-md:text-4xl max-sm:text-3xl">
+          Popular Products
         </h2>
-        <div>
-          <p className="text-white text-center text-2xl font-semibold max-md:text-xl max-[480px]:text-base">
-            Buy the latest electronics.
-          </p>
-          <p className="text-white text-center text-2xl font-semibold max-md:text-xl max-[480px]:text-base">
-            The best electronics for tech lovers.
-          </p>
-          <Link href="/shop" className="block text-blue-600 bg-white font-bold px-12 py-3 text-xl hover:bg-gray-100 w-96 mt-2  max-md:text-lg max-md:w-72 max-[480px]:w-60 mx-auto">
-            SHOP NOW
-          </Link>
-        </div>
+        <p className="text-gray-500 text-lg mt-3 max-sm:text-base">
+          Discover our latest arrivals — crafted for your lifestyle.
+        </p>
       </div>
-    </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-w-7xl mx-auto px-4 sm:px-6">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+          >
+            {/* Image */}
+            <div className="relative w-full h-40 sm:h-44 flex items-center justify-center overflow-hidden bg-gray-50">
+              <Image
+                src={product.image}
+                alt={product.name}
+                width={160}
+                height={160}
+                className="object-contain transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+            {/* Product Info */}
+            <div className="p-3">
+              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">
+                {product.name}
+              </h3>
+              <p className="text-blue-600 text-lg font-bold mb-3">
+                {product.price}
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-2">
+                <button className="flex-1 flex items-center justify-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors duration-200">
+                  <ShoppingCart size={14} /> 
+                  <span className="hidden sm:inline">Add</span>
+                </button>
+                <button className="p-2 rounded-md border border-gray-300 hover:bg-pink-50 transition-colors duration-200">
+                  <Heart size={16} className="text-pink-500" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 };
 

@@ -100,6 +100,16 @@ const corsOptions = {
   credentials: true, // Allow cookies and authorization headers
 };
 
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+
 // Apply general rate limiting to all routes
 app.use(generalLimiter);
 

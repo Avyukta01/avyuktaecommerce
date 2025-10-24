@@ -26,44 +26,64 @@ const HeaderTop = () => {
     toast.success("Logout successful!");
   }
   return (
-    <div className="h-10 text-white bg-blue-500 max-lg:px-5 max-lg:h-16 max-[573px]:px-0">
-      <div className="flex justify-between h-full max-lg:flex-col max-lg:justify-center max-lg:items-center max-w-screen-2xl mx-auto px-12 max-[573px]:px-0">
-        <ul className="flex items-center h-full gap-x-5 max-[370px]:text-sm max-[370px]:gap-x-2">
-          <li className="flex items-center gap-x-2 font-semibold">
-            <FaHeadphones className="text-white" />
-            <span>+381 61 123 321</span>
-          </li>
-          <li className="flex items-center gap-x-2 font-semibold">
-            <FaRegEnvelope className="text-white text-xl" />
-            <span>test@email.com</span>
-          </li>
-        </ul>
-        <ul className="flex items-center gap-x-5 h-full max-[370px]:text-sm max-[370px]:gap-x-2 font-semibold">
-          {!session ? ( 
-          <>
-          <li className="flex items-center">
-            <Link href="/login" className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Login</span>
-            </Link>
-          </li>
-          <li className="flex items-center">
-            <Link href="/register" className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Register</span>
-            </Link>
-          </li>
-          </>
-          ) :  (<>
-          <span className="ml-10 text-base">{session.user?.email}</span>
-          <li className="flex items-center">
-            <button onClick={() => handleLogout()} className="flex items-center gap-x-2 font-semibold">
-              <FaRegUser className="text-white" />
-              <span>Log out</span>
-            </button>
-          </li>
-          </>)}
-        </ul>
+    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-2">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-2 lg:gap-4">
+          {/* Contact Info */}
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 lg:gap-6 text-xs sm:text-sm">
+            <div className="flex items-center gap-1.5">
+              <FaHeadphones className="text-blue-200 text-sm" />
+              <span className="font-medium">+91 98765 43210</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <FaRegEnvelope className="text-blue-200 text-sm" />
+              <span className="font-medium hidden sm:inline">support@company.com</span>
+              <span className="font-medium sm:hidden">support@company.com</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <FaLocationDot className="text-blue-200 text-sm" />
+              <span className="font-medium">Delhi, India</span>
+            </div>
+          </div>
+
+          {/* Auth Links */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {!session ? (
+              <>
+                <Link 
+                  href="/login" 
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/10 hover:bg-white/20 transition-colors duration-200 text-xs sm:text-sm font-medium"
+                >
+                  <FaRegUser className="text-blue-200 text-sm" />
+                  <span>Login</span>
+                </Link>
+                <Link 
+                  href="/register" 
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-white/20 hover:bg-white/30 transition-colors duration-200 text-xs sm:text-sm font-medium"
+                >
+                  <FaRegUser className="text-blue-200 text-sm" />
+                  <span>Register</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <span className="text-xs sm:text-sm font-medium text-blue-100 hidden sm:inline">
+                  Welcome, {session.user?.email?.split('@')[0]}
+                </span>
+                <span className="text-xs font-medium text-blue-100 sm:hidden">
+                  Welcome
+                </span>
+                <button 
+                  onClick={() => handleLogout()} 
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-red-500/20 hover:bg-red-500/30 transition-colors duration-200 text-xs sm:text-sm font-medium"
+                >
+                  <FaRegUser className="text-red-200 text-sm" />
+                  <span>Logout</span>
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

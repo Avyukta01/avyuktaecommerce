@@ -101,7 +101,7 @@ export const navigation = {
     { name: "Partners", href: "#" },
   ],
   help: [
-    { name: "Contact", href: "#" },
+    { name: "Contact", href: "/Contactus" },
     { name: "How to Buy at Singitronic", href: "#" },
     { name: "FAQ", href: "#" },
   ],

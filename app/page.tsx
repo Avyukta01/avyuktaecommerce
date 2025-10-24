@@ -1,12 +1,15 @@
 import { CategoryMenu, Hero, Incentives, IntroducingSection, Newsletter, ProductsSection } from "@/components";
+import PromoBanner from "@/components/PromoBanner";
 
 export default function Home() {
   return (
     <>
     <Hero />
-    <IntroducingSection />
+     <ProductsSection />
+   
     <CategoryMenu />
-    <ProductsSection />
+    <IntroducingSection />
+    <PromoBanner/>
     </>
   );
 }
