@@ -1,5 +1,5 @@
-import NextAuth, { NextAuthOptions } from "next-auth";
-import { Account, User as AuthUser } from "next-auth";
+import NextAuth from "next-auth";
+import type { User as AuthUser } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs";
 import prisma from "@/utils/db";
 import { nanoid } from "nanoid";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
     // }),
   ],
   callbacks: {
-    async signIn({ user, account }: { user: AuthUser; account: Account }) {
+    async signIn({ user, account }: { user: AuthUser; account: any }) {
       if (account?.provider === "credentials") {
         return true;
       }

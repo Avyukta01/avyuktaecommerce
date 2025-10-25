@@ -16,13 +16,12 @@ import { useWishlistStore } from "@/app/_zustand/wishlistStore";
 import apiClient from "@/lib/api";
 
 // Material UI imports
-import { AppBar, Toolbar, IconButton, Badge, Avatar, Box, Menu, MenuItem, Tooltip, Container, Paper } from "@mui/material";
-import { Search, Favorite, ShoppingCart, Notifications } from "@mui/icons-material";
+import { AppBar, Toolbar, Box, Paper, Container } from "@mui/material";
 
 const Header = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const pathname = usePathname();
-  const { wishlist, setWishlist, wishQuantity } = useWishlistStore();
+  const { wishQuantity, setWishlist } = useWishlistStore();
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -34,7 +33,6 @@ const Header = () => {
     toast.success("Logout successful!");
   };
 
-  // getting all wishlist items by user id
   const getWishlistByUserId = async (id: string) => {
     const response = await apiClient.get(`/api/wishlist/${id}`, { cache: "no-store" });
     const wishlist = await response.json();
@@ -43,16 +41,15 @@ const Header = () => {
       title: string;
       price: number;
       image: string;
-      slug:string
+      slug: string
       stockAvailabillity: number;
     }[] = [];
-    
-    wishlist.map((item: any) => productArray.push({id: item?.product?.id, title: item?.product?.title, price: item?.product?.price, image: item?.product?.mainImage, slug: item?.product?.slug, stockAvailabillity: item?.product?.inStock}));
-    
+
+    wishlist.map((item: any) => productArray.push({ id: item?.product?.id, title: item?.product?.title, price: item?.product?.price, image: item?.product?.mainImage, slug: item?.product?.slug, stockAvailabillity: item?.product?.inStock }));
+
     setWishlist(productArray);
   };
 
-  // getting user by email so I can get his user id
   const getUserByEmail = async () => {
     if (session?.user?.email) {
       apiClient.get(`/api/users/email/${session?.user?.email}`, { cache: "no-store" })
@@ -65,18 +62,17 @@ const Header = () => {
 
   useEffect(() => {
     getUserByEmail();
-  }, [session?.user?.email, wishlist.length]);
+  }, [session?.user?.email]);
 
   return (
-    <header>
-      {/* Only show HeaderTop for website, not admin */}
+    <header suppressHydrationWarning>
+      {/* HeaderTop only for website */}
       {pathname.startsWith("/admin") === false && <HeaderTop />}
 
-      {/* Material UI AppBar for modern design */}
-      <AppBar position="static" sx={{ bgcolor: "white", boxShadow: 2 }}>
+      <AppBar position="static" sx={{ bgcolor: "white", boxShadow: 3, borderBottom: "1px solid #e2e8f0" }}>
         <Container maxWidth="xl">
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
-            
+          <Toolbar sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", py: 1.5 }}>
+
             {/* Logo */}
             <Link href="/">
               {pathname.startsWith("/admin") ? (
@@ -86,27 +82,35 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Website Header Content */}
+            {/* Website Header */}
             {pathname.startsWith("/admin") === false && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-                {/* Search */}
-                <Paper sx={{ display: "flex", alignItems: "center", px: 1, py: 0.3, borderRadius: 2, minWidth: { xs: "200px", md: "400px" }}} elevation={2}>
+                <Paper
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    px: 1,
+                    py: 0.3,
+                    borderRadius: 3,
+                    minWidth: { xs: "200px", md: "400px" },
+                    boxShadow: 2
+                  }}
+                >
                   <SearchInput />
                 </Paper>
 
-                {/* Icons */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <NotificationBell />
+                  <NotificationBell sx={{ cursor: "pointer", "&:hover": { color: "#2563eb" } }} />
                   <HeartElement wishQuantity={wishQuantity} />
                   <CartElement />
                 </Box>
               </Box>
             )}
 
-            {/* Admin Header Content */}
+            {/* Admin Header */}
             {pathname.startsWith("/admin") && (
               <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <NotificationBell />
+                <NotificationBell sx={{ cursor: "pointer", "&:hover": { color: "#2563eb" } }} />
                 <div className="dropdown dropdown-end">
                   <div tabIndex={0} role="button" className="w-10">
                     <Image
@@ -119,21 +123,23 @@ const Header = () => {
                   </div>
                   <ul
                     tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 text-gray-800"
                   >
                     <li>
-                      <Link href="/admin">Dashboard</Link>
+                      <Link href="/admin" className="hover:text-blue-600">Dashboard</Link>
                     </li>
                     <li>
-                      <a>Profile</a>
+                      <a className="hover:text-blue-600">Profile</a>
                     </li>
                     <li onClick={handleLogout}>
-                      <a href="#">Logout</a>
+                      <a href="#" className="hover:text-red-600">Logout</a>
                     </li>
                   </ul>
+
                 </div>
               </Box>
             )}
+
           </Toolbar>
         </Container>
       </AppBar>

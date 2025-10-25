@@ -6,12 +6,13 @@ export const apiClient = {
   async request(endpoint: string, options: RequestInit = {}) {
     const url = `${this.baseUrl}${endpoint}`;
     
-    const defaultOptions: RequestInit = {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+    // Build headers; if uploading FormData, don't set Content-Type (browser sets correct boundary)
+    const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    const headers: HeadersInit = {
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+      ...(options.headers || {}),
     };
+    const defaultOptions: RequestInit = { headers };
     
     return fetch(url, { ...defaultOptions, ...options });
   },
@@ -24,14 +25,18 @@ export const apiClient = {
     apiClient.request(endpoint, {
       ...options,
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: (typeof FormData !== 'undefined' && data instanceof FormData)
+        ? data
+        : (data ? JSON.stringify(data) : undefined),
     }),
     
   put: (endpoint: string, data?: any, options?: RequestInit) =>
     apiClient.request(endpoint, {
       ...options,
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body: (typeof FormData !== 'undefined' && data instanceof FormData)
+        ? data
+        : (data ? JSON.stringify(data) : undefined),
     }),
     
   delete: (endpoint: string, options?: RequestInit) =>

@@ -21,7 +21,7 @@ interface Merchant {
   address: string | null;
   description: string | null;
   status: string;
-  products: Product[];
+  product: Product[];
 }
 
 interface MerchantDetailPageProps {
@@ -257,7 +257,7 @@ const handleInputChange = (
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-bold mb-4">Merchant Products</h2>
-          {merchant.products.length > 0 ? (
+          {merchant.product.length > 0 ? (
             <table className="w-full">
               <thead>
                 <tr className="border-b">
@@ -268,14 +268,14 @@ const handleInputChange = (
                 </tr>
               </thead>
               <tbody>
-                {merchant.products.map((product) => (
+                {merchant.product.map((product) => (
                   <tr key={product.id} className="border-b hover:bg-gray-50">
                     <td className="py-4">{product.title}</td>
                     <td className="py-4">${product.price / 100}</td>
                     <td className="py-4">{product.inStock}</td>
                     <td className="py-4">
                       <Link
-                        href={`/admin/products/${product.id}`}
+                        href={`/admin/product/${product.id}`}
                         className="text-blue-500 hover:underline"
                       >
                         View

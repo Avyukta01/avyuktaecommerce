@@ -23,3 +23,8 @@
       ),
       linear-gradient(-45deg, white 50%, #3B82F6 50.99%);
 }
+
+table th, table td {
+  height: 60px !important;
+  vertical-align: middle;
+}

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,41 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id             String                   @id @default(uuid())
-  slug           String                   @unique
-  title          String
-  mainImage      String
-  price          Int                      @default(0)
-  rating         Int                      @default(0)
-  description    String
-  manufacturer   String
-  inStock        Int                      @default(1)
-  categoryId     String
-  category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  customerOrders customer_order_product[]
-  Wishlist       Wishlist[]
+model customer_order_product {
+  id              String         @id @default(uuid())
+  customerOrderId String
+  productId       String
+  quantity        Int
+  customerOrder   customer_order @relation(fields: [customerOrderId], references: [id])
+  product         product        @relation(fields: [productId], references: [id])
 
-  merchantId     String
-  merchant       Merchant @relation(fields: [merchantId], references: [id])
+  @@index([customerOrderId], map: "customer_order_product_customerOrderId_fkey")
+  @@index([productId], map: "customer_order_product_productId_fkey")
 }
 
-model Image {
-  imageID   String @id @default(uuid())
-  productID String
-  image     String
+model category {
+  id      String    @id @default(uuid())
+  name    String    @unique(map: "Category_name_key")
+  product product[]
 }
 
-model User {
-  id            String         @id @default(uuid())
-  email         String         @unique
-  password      String?
-  role          String?        @default("user")
-  Wishlist      Wishlist[]
-  notifications Notification[]
-}
-
-model Customer_order {
+model customer_order {
   id          String                   @id @default(uuid())
   name        String
   lastname    String
@@ -66,72 +44,146 @@ model Customer_order {
   products    customer_order_product[]
 }
 
-model customer_order_product {
-  id              String         @id @default(uuid())
-  customerOrder   Customer_order @relation(fields: [customerOrderId], references: [id])
-  customerOrderId String
-  product         Product        @relation(fields: [productId], references: [id])
-  productId       String
-  quantity        Int
+model image {
+  imageID   String @id
+  productID String
+  image     String
 }
 
-model Category {
-  id       String    @id @default(uuid())
-  name     String    @unique
-  products Product[] // Define a one-to-many relationship
+model merchant {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  email       String?
+  phone       String?
+  address     String?
+  status      String    @default("ACTIVE")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  product     product[]
 }
 
-model Wishlist {
-  id        String  @id @default(uuid())
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+model notification {
+  id        String                @id
   userId    String
+  title     String
+  message   String                @db.Text
+  type      notification_type
+  isRead    Boolean               @default(false)
+  priority  notification_priority @default(NORMAL)
+  metadata  String?               @db.LongText
+  createdAt DateTime              @default(now())
+  updatedAt DateTime
+  user      user                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Notification_userId_fkey")
+
+  @@index([createdAt], map: "Notification_createdAt_idx")
+  @@index([userId], map: "Notification_userId_idx")
+  @@index([userId, isRead], map: "Notification_userId_isRead_idx")
+  @@index([userId, type], map: "Notification_userId_type_idx")
 }
 
-enum NotificationType {
+model product {
+  id             String                   @id
+  slug           String                   @unique(map: "Product_slug_key")
+  title          String
+  mainImage      String
+  price          Int                      @default(0)
+  rating         Int                      @default(0)
+  description    String
+  manufacturer   String
+  inStock        Int                      @default(1)
+  categoryId     String
+  merchantId     String
+  customerOrders customer_order_product[]
+  category       category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade, map: "Product_categoryId_fkey")
+  merchant       merchant                 @relation(fields: [merchantId], references: [id], map: "Product_merchantId_fkey")
+  wishlist       wishlist[]
+
+  @@index([categoryId], map: "Product_categoryId_fkey")
+  @@index([merchantId], map: "Product_merchantId_fkey")
+}
+
+model user {
+  id           String         @id
+  email        String         @unique(map: "User_email_key")
+  password     String?
+  role         String?        @default("user")
+  notification notification[]
+  wishlist     wishlist[]
+
+  wallet wallet? // <-- Added opposite relation for wallet
+}
+
+model wishlist {
+  id        String  @id
+  productId String
+  userId    String
+  product   product @relation(fields: [productId], references: [id], onDelete: Cascade, map: "Wishlist_productId_fkey")
+  user      user    @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Wishlist_userId_fkey")
+
+  @@index([productId], map: "Wishlist_productId_fkey")
+  @@index([userId], map: "Wishlist_userId_fkey")
+}
+
+enum notification_type {
   ORDER_UPDATE
   PAYMENT_STATUS
   PROMOTION
   SYSTEM_ALERT
 }
 
-enum NotificationPriority {
+enum notification_priority {
   LOW
   NORMAL
   HIGH
   URGENT
 }
 
-model Notification {
-  id        String               @id @default(uuid())
-  userId    String
-  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  message   String               @db.Text
-  type      NotificationType
-  isRead    Boolean              @default(false)
-  priority  NotificationPriority @default(NORMAL)
-  metadata  Json?
-  createdAt DateTime             @default(now())
-  updatedAt DateTime             @updatedAt
+model wallet {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Int      @default(0)
+  currency  String   @default("INR")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([userId])
-  @@index([userId, isRead])
-  @@index([userId, type])
+  transactions walletTransaction[]
+}
+
+model walletTransaction {
+  id          String             @id @default(uuid())
+  walletId    String
+  wallet      wallet             @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount      Int
+  type        transaction_type
+  status      transaction_status @default(PENDING)
+  description String?
+  reference   String?
+  metadata    Json?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  @@index([walletId])
+  @@index([type])
+  @@index([status])
   @@index([createdAt])
 }
-model Merchant {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  email       String?
-  phone       String?
-  address     String?
-  status      String   @default("ACTIVE")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 
-  // relasi
-  products Product[]
+enum transaction_type {
+  CREDIT
+  DEBIT
+  REFUND
+  PAYMENT
+  TRANSFER
 }
+
+enum transaction_status {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+

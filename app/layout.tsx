@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import 'svgmap/dist/svgMap.min.css';
 import SessionProvider from "@/utils/SessionProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Providers from "@/Providers";
 import SessionTimeoutWrapper from "@/components/SessionTimeoutWrapper";
+import ConditionalLayout from "@/components/ConditionalLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,17 +23,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   return (
     <html lang="en" data-theme="light">
       <body className={inter.className}>
         <SessionProvider session={session}>
           <SessionTimeoutWrapper />
-          <Header />
-          <Providers>
-            {children}
-          </Providers>
-          <Footer />
+          <ConditionalLayout>
+            <Providers>
+              {children}
+            </Providers>
+          </ConditionalLayout>
         </SessionProvider>
       </body>
     </html>

@@ -2,10 +2,11 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function getAllMerchants(request, response) {
+  console.log("GET /merchants called"); // <
   try {
     const merchants = await prisma.merchant.findMany({
       include: {
-        products: true,
+        product: true,
       },
     });
     return response.json(merchants);
@@ -23,7 +24,7 @@ async function getMerchantById(request, response) {
         id: id,
       },
       include: {
-        products: true,
+        product: true,
       },
     });
 
@@ -42,13 +43,18 @@ async function createMerchant(request, response) {
   try {
     const { name, email, phone, address, description, status } = request.body;
 
+    // Validate required fields
+    if (!name || name.trim().length === 0) {
+      return response.status(400).json({ error: "Merchant name is required" });
+    }
+
     const merchant = await prisma.merchant.create({
       data: {
-        name,
-        email,
-        phone,
-        address,
-        description,
+        name: name.trim(),
+        email: email?.trim() || null,
+        phone: phone?.trim() || null,
+        address: address?.trim() || null,
+        description: description?.trim() || null,
         status: status || "ACTIVE",
       },
     });
@@ -56,7 +62,10 @@ async function createMerchant(request, response) {
     return response.status(201).json(merchant);
   } catch (error) {
     console.error("Error creating merchant:", error);
-    return response.status(500).json({ error: "Error creating merchant" });
+    return response.status(500).json({ 
+      error: "Error creating merchant",
+      details: error.message 
+    });
   }
 }
 
@@ -93,10 +102,10 @@ async function deleteMerchant(request, response) {
     // Check if merchant has products before deletion
     const merchant = await prisma.merchant.findUnique({
       where: { id },
-      include: { products: true },
+      include: { product: true },
     });
 
-    if (merchant?.products.length > 0) {
+    if (merchant?.product.length > 0) {
       return response.status(400).json({
         error: "Cannot delete merchant with existing products",
       });

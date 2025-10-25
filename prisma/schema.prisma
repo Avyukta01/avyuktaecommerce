@@ -47,6 +47,7 @@ model User {
   role          String?        @default("user")
   Wishlist      Wishlist[]
   notifications Notification[]
+  wallet        Wallet?
   // Back relation for bulk upload batches
   bulkUploadBatches bulk_upload_batch[] @relation("UserBatches")
 }
@@ -125,6 +126,7 @@ model Notification {
   @@index([userId, type])
   @@index([createdAt])
 }
+
 model Merchant {
   id          String   @id @default(uuid())
   name        String
@@ -188,4 +190,51 @@ enum BulkUploadItemStatus {
   CREATED
   UPDATED
   ERROR
+}
+
+model Wallet {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance     Int      @default(0) // in paise (smallest currency unit)
+  currency    String   @default("INR")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  transactions WalletTransaction[]
+}
+
+enum TransactionType {
+  CREDIT
+  DEBIT
+  REFUND
+  PAYMENT
+  TRANSFER
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model WalletTransaction {
+  id            String            @id @default(uuid())
+  walletId      String
+  wallet        Wallet            @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  amount        Int               // in paise
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+  description   String?
+  reference     String?           // order ID, payment ID, etc.
+  metadata      Json?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  
+  @@index([walletId])
+  @@index([type])
+  @@index([status])
+  @@index([createdAt])
 }

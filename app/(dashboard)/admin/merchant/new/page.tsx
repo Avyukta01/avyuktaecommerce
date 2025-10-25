@@ -41,15 +41,24 @@ export default function NewMerchantPage() {
       const response = await apiClient.post("/api/merchants", formData);
 
       if (!response.ok) {
-        throw new Error("Failed to create merchant");
+        let details = "";
+        try {
+          const errJson = await response.json();
+          details = errJson?.details || errJson?.error || errJson?.message || "";
+        } catch {
+          try {
+            details = await response.text();
+          } catch {}
+        }
+        throw new Error(details ? `Failed to create merchant: ${details}` : "Failed to create merchant");
       }
 
       const data = await response.json();
       toast.success("Merchant created successfully");
       router.push(`/admin/merchant/${data.id}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating merchant:", error);
-      toast.error("Failed to create merchant");
+      toast.error(error?.message || "Failed to create merchant");
     } finally {
       setIsSubmitting(false);
     }
@@ -58,95 +67,108 @@ export default function NewMerchantPage() {
   return (
     <div className="flex h-screen">
       <DashboardSidebar />
-      <div className="flex-1 p-10 overflow-y-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Add New Merchant</h1>
-          <Link
-            href="/admin/merchant"
-            className="bg-gray-500 text-white px-6 py-2 rounded-md hover:bg-gray-600 transition"
-          >
-            Cancel
-          </Link>
+      <div className="flex-1 p-4 overflow-y-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">Two Column Vertical Form</h1>
+          <p className="text-gray-600">Personal Details</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Name</label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Merchant name"
-              />
+            {/* Left Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Name:</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter merchant name"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Email:</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter email"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Phone:</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter phone number"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Status:</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="email@example.com"
-              />
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Address:</label>
+                <input
+                  type="text"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter address"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Description:</label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
+                  placeholder="Enter description"
+                ></textarea>
+              </div>
             </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Phone</label>
-              <input
-                type="text"
-                name="phone"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Phone number"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">Status</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
+            {/* Submit Button */}
+            <div className="flex justify-end mt-8 gap-4 col-span-1 md:col-span-2">
+              <Link
+                href="/admin/merchant"
+                className="bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600 transition"
               >
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-              </select>
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-gray-700 font-medium mb-2">Address</label>
-              <input
-                type="text"
-                name="address"
-                value={formData.address}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300"
-                placeholder="Merchant address"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-gray-700 font-medium mb-2">Description</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded focus:outline-none focus:ring focus:border-blue-300 h-32"
-                placeholder="Enter merchant description"
-              ></textarea>
-            </div>
-            <div className="md:col-span-2">
+                Cancel
+              </Link>
               <button 
                 type="submit" 
                 disabled={isSubmitting}
-                className={`bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition ${
+                className={`bg-orange-500 text-white px-8 py-3 rounded-md font-medium hover:bg-orange-600 transition-colors ${
                   isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
-                {isSubmitting ? "Creating..." : "Create Merchant"}
+                {isSubmitting ? "Creating..." : "Submit"}
               </button>
             </div>
           </form>

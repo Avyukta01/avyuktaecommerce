@@ -28,7 +28,7 @@ interface OrderProduct {
 }
 
 const AdminSingleOrder = () => {
-  const [orderProducts, setOrderProducts] = useState<OrderProduct[]>();
+  const [orderProducts, setOrderProducts] = useState<OrderProduct[]>([]);
   const [order, setOrder] = useState<Order>({
     id: "",
     adress: "",
@@ -60,11 +60,21 @@ const AdminSingleOrder = () => {
     };
 
     const fetchOrderProducts = async () => {
-      const response = await apiClient.get(
-        `/api/order-product/${params?.id}`
-      );
-      const data: OrderProduct[] = await response.json();
-      setOrderProducts(data);
+      try {
+        const response = await apiClient.get(
+          `/api/order-product/${params?.id}`
+        );
+        if (response.ok) {
+          const data: OrderProduct[] = await response.json();
+          setOrderProducts(Array.isArray(data) ? data : []);
+        } else {
+          console.error('Failed to fetch order products:', response.statusText);
+          setOrderProducts([]);
+        }
+      } catch (error) {
+        console.error('Error fetching order products:', error);
+        setOrderProducts([]);
+      }
     };
 
     fetchOrderData();
@@ -99,13 +109,7 @@ const AdminSingleOrder = () => {
         return;
       }
 
-      apiClient.put(`/api/orders/${order?.id}`, {
-        method: "PUT", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(order),
-      })
+      apiClient.put(`/api/orders/${order?.id}`, order)
         .then((response) => {
           if (response.status === 200) {
             toast.success("Order updated successfuly");
@@ -122,22 +126,23 @@ const AdminSingleOrder = () => {
   };
 
   const deleteOrder = async () => {
-    const requestOptions = {
-      method: "DELETE",
-    };
-
-    apiClient.delete(
-      `/api/order-product/${order?.id}`,
-      requestOptions
-    ).then((response) => {
-      apiClient.delete(
-        `/api/orders/${order?.id}`,
-        requestOptions
-      ).then((response) => {
+    try {
+      // First delete order products
+      await apiClient.delete(`/api/order-product/${order?.id}`);
+      
+      // Then delete the order
+      const response = await apiClient.delete(`/api/orders/${order?.id}`);
+      
+      if (response.ok) {
         toast.success("Order deleted successfully");
         router.push("/admin/orders");
-      });
-    });
+      } else {
+        toast.error("Failed to delete order");
+      }
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      toast.error("Failed to delete order");
+    }
   };
 
   return (
@@ -345,7 +350,8 @@ const AdminSingleOrder = () => {
           </label>
         </div>
         <div>
-          {orderProducts?.map((product) => (
+          {orderProducts && orderProducts.length > 0 ? (
+            orderProducts.map((product) => (
             <div className="flex items-center gap-x-4" key={product?.id}>
               <Image
                 src={product?.product?.mainImage ? `/${product?.product?.mainImage}` : "/product_placeholder.jpg"}
@@ -363,7 +369,10 @@ const AdminSingleOrder = () => {
                 </p>
               </div>
             </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-gray-500">No products found for this order.</p>
+          )}
           <div className="flex flex-col gap-y-2 mt-10">
             <p className="text-2xl">Subtotal: ${order?.total}</p>
             <p className="text-2xl">Tax 20%: ${order?.total / 5}</p>

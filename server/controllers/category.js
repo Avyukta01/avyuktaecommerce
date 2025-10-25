@@ -10,6 +10,7 @@ const createCategory = asyncHandler(async (request, response) => {
   }
 
   const category = await prisma.category.create({
+
     data: {
       name: name.trim(),
     },
