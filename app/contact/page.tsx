@@ -6,9 +6,9 @@ import Contactus from "@/components/Contectus";
 const ContactPage = () => {
   return (
     <div className="min-h-screen bg-white">
-      <Header />
+     
       <Contactus/>
-      <Footer />
+     
     </div>
   );
 };

@@ -12,7 +12,7 @@ const CategoryMenu = () => {
     <section className="py-16 bg-[#F8FAFC]">
       {/* Section Heading */}
       <div className="text-black">
-  <Heading title="BROWSE CATEGORIES" />
+  <Heading title="Browse Categories" />
 </div>
 
 

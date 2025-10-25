@@ -1,61 +1,64 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Heart, ShoppingCart } from "lucide-react";
+import apiClient from "@/lib/api"; // Your axios/fetch wrapper
 
-// Use only images that exist in /public to avoid 404s
-const products = [
-  {
-    id: 1,
-    name: "Smart Watch",
-    price: "₹2,499",
-    image: "/watch for banner.png",
-  },
-  {
-    id: 2,
-    name: "Wireless Earbuds",
-    price: "₹1,799",
-    image: "/earbuds 1.png",
-  },
-  {
-    id: 3,
-    name: "Gaming Headset",
-    price: "₹3,299",
-    image: "/headphones 1.png",
-  },
-  {
-    id: 4,
-    name: "Bluetooth Speaker",
-    price: "₹2,099",
-    image: "/sony speaker image.png",
-  },
-  {
-    id: 5,
-    name: "Smartphone",
-    price: "₹19,999",
-    image: "/smart phone 1.png",
-  },
-  {
-    id: 6,
-    name: "Laptop",
-    price: "₹49,999",
-    image: "/laptop 1.webp",
-  },
-  {
-    id: 7,
-    name: "Smart LED TV",
-    price: "₹25,999",
-    image: "/tv.jpg",
-  },
-  {
-    id: 8,
-    name: "Tablet",
-    price: "₹12,499",
-    image: "/tablet 1 1.png",
-  },
-];
+// -----------------------------
+// Type Definitions
+// -----------------------------
+interface Product {
+  id: number | string;
+  title: string;
+  price: number;
+  mainImage?: string;
+  [key: string]: any; // extra fields from API
+}
 
-const IntroducingSection = () => {
+interface CartItem extends Product {
+  quantity: number;
+}
+
+// -----------------------------
+// Component
+// -----------------------------
+const IntroducingSection: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Fetch products dynamically from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await apiClient.get("/api/products");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(Array.isArray(data) ? data : []);
+        } else {
+          console.error("Failed to fetch products:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Add product to cart
+  const handleAddToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existing = prevCart.find((item) => item.id === product.id);
+      if (existing) {
+        return prevCart.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
+
   return (
     <section className="py-20 bg-white relative">
       {/* Section Header */}
@@ -70,44 +73,53 @@ const IntroducingSection = () => {
 
       {/* Product Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-w-7xl mx-auto px-4 sm:px-6">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-          >
-            {/* Image */}
-            <div className="relative w-full h-40 sm:h-44 flex items-center justify-center overflow-hidden bg-gray-50">
-              <Image
-                src={product.image}
-                alt={product.name}
-                width={160}
-                height={160}
-                className="object-contain transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div
+              key={product.id}
+              className="group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            >
+              {/* Image */}
+              <div className="relative w-full h-40 sm:h-44 flex items-center justify-center overflow-hidden bg-gray-50">
+                <Image
+                  src={product.mainImage || "/placeholder.png"}
+                  alt={product.title}
+                  width={160}
+                  height={160}
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
 
-            {/* Product Info */}
-            <div className="p-3">
-              <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">
-                {product.name}
-              </h3>
-              <p className="text-blue-600 text-lg font-bold mb-3">
-                {product.price}
-              </p>
+              {/* Product Info */}
+              <div className="p-3">
+                <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">
+                  {product.title}
+                </h3>
+                <p className="text-blue-600 text-lg font-bold mb-3">
+                  ₹{product.price}
+                </p>
 
-              {/* Buttons */}
-              <div className="flex gap-2">
-                <button className="flex-1 flex items-center justify-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors duration-200">
-                  <ShoppingCart size={14} /> 
-                  <span className="hidden sm:inline">Add</span>
-                </button>
-                <button className="p-2 rounded-md border border-gray-300 hover:bg-pink-50 transition-colors duration-200">
-                  <Heart size={16} className="text-pink-500" />
-                </button>
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="flex-1 flex items-center justify-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    <ShoppingCart size={14} />
+                    <span className="hidden sm:inline">Add</span>
+                  </button>
+                  <button className="p-2 rounded-md border border-gray-300 hover:bg-pink-50 transition-colors duration-200">
+                    <Heart size={16} className="text-pink-500" />
+                  </button>
+                </div>
               </div>
             </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-700 py-20 text-lg font-semibold">
+            Loading products...
           </div>
-        ))}
+        )}
       </div>
     </section>
   );

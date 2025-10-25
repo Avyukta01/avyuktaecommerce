@@ -1,27 +1,22 @@
-// *********************
-// Role of the component: Footer component
-// Name of the component: Footer.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Footer />
-// Input parameters: no input parameters
-// Output: Footer component
-// *********************
-
 "use client";
 
 import { navigation } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
+import { Facebook, Twitter, Instagram } from "lucide-react"; // <-- Added icons
 
 const Footer = () => {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) {
     return null;
   }
+
   return (
-    <footer className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200" aria-labelledby="footer-heading">
+    <footer
+      className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200"
+      aria-labelledby="footer-heading"
+    >
       <div>
         <h2 id="footer-heading" className="sr-only">
           Footer
@@ -38,18 +33,36 @@ const Footer = () => {
                 className="h-auto w-auto mb-6"
               />
               <p className="text-gray-600 text-sm leading-relaxed mb-6">
-                Your trusted partner for quality electronics and innovative technology solutions.
+                Your trusted partner for quality electronics and innovative
+                technology solutions.
               </p>
+
+              {/* Social Media Icons */}
               <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">F</span>
-                </div>
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">T</span>
-                </div>
-                <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">I</span>
-                </div>
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors"
+                >
+                  <Facebook size={16} color="white" />
+                </a>
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center hover:bg-sky-600 transition-colors"
+                >
+                  <Twitter size={16} color="white" />
+                </a>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
+                >
+                  <Instagram size={16} color="white" />
+                </a>
               </div>
             </div>
 
@@ -72,7 +85,7 @@ const Footer = () => {
                   ))}
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Company
@@ -90,7 +103,7 @@ const Footer = () => {
                   ))}
                 </ul>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Support
@@ -110,7 +123,7 @@ const Footer = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Bottom Section */}
           <div className="mt-12 pt-8 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center">
@@ -118,14 +131,17 @@ const Footer = () => {
                 © 2024 Your Company. All rights reserved.
               </p>
               <div className="mt-4 sm:mt-0 flex space-x-6">
-                <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                <a
+                  href="/Privacy"
+                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                >
                   Privacy Policy
                 </a>
-                <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                <a
+                  href="/TermsCondition"
+                  className="text-sm text-gray-500 hover:text-blue-600 transition-colors"
+                >
                   Terms of Service
-                </a>
-                <a href="#" className="text-sm text-gray-500 hover:text-blue-600 transition-colors">
-                  Cookie Policy
                 </a>
               </div>
             </div>

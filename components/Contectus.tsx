@@ -26,193 +26,265 @@ const Contactus = () => {
   };
 
   return (
-    <section className="py-5" style={{ background: "linear-gradient(135deg, #f8f9fa, #e9f3ff)" }}>
-      <div className="container">
-        {/* Hero Section */}
-        <div className="text-center mb-5">
-          <div className="d-inline-flex align-items-center justify-content-center bg-light rounded-circle mb-3" style={{ width: 70, height: 70 }}>
+    <section
+      style={{
+        padding: "3rem 1rem",
+        background: "linear-gradient(135deg, #f8f9fa, #e9f3ff)",
+      }}
+    >
+      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+        {/* Hero */}
+        <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+          <div
+            style={{
+              width: 70,
+              height: 70,
+              margin: "0 auto 1rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "#fff",
+              borderRadius: "50%",
+              boxShadow: "0 2px 15px rgba(0,0,0,0.1)",
+            }}
+          >
             <MessageCircle className="text-primary" size={35} />
           </div>
-          <h1 className="fw-bold display-5 text-dark">
-            Get in <span className="text-primary">Touch</span>
+          <h1 style={{ fontWeight: 700, fontSize: "2.5rem", color: "#1f2937" }}>
+            Get in <span style={{ color: "#0d6efd" }}>Touch</span>
           </h1>
-          <p className="text-muted fs-5 mx-auto" style={{ maxWidth: 700 }}>
+          <p
+            style={{
+              maxWidth: 700,
+              margin: "1rem auto 0",
+              color: "#6c757d",
+              fontSize: "1rem",
+            }}
+          >
             Have questions or need assistance? We're here to help! Send us a message and we'll respond within 24 hours.
           </p>
         </div>
 
-        <div className="row g-4">
-          {/* Contact Form */}
-          <div className="col-lg-8">
-            <div className="card border-0 shadow-lg rounded-4">
-              <div className="card-body p-4 p-lg-5">
-                <h2 className="fw-bold mb-3 text-dark">Send us a Message</h2>
-                <p className="text-muted mb-4">Fill out the form below and we'll get back to you as soon as possible.</p>
-
-                <form onSubmit={handleSubmit}>
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="form-label fw-semibold">Full Name *</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder="Enter your full name"
-                        required
-                        className="form-control rounded-3"
-                      />
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label fw-semibold">Email Address *</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder="Enter your email"
-                        required
-                        className="form-control rounded-3"
-                      />
-                    </div>
-                    <div className="col-12">
-                      <label className="form-label fw-semibold">Subject *</label>
-                      <input
-                        type="text"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="What's this about?"
-                        required
-                        className="form-control rounded-3"
-                      />
-                    </div>
-                    <div className="col-12">
-                      <label className="form-label fw-semibold">Message *</label>
-                      <textarea
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        rows={6}
-                        placeholder="Tell us more about your inquiry..."
-                        required
-                        className="form-control rounded-3"
-                      ></textarea>
-                    </div>
-                    <div className="col-12">
-                      <button type="submit" className="btn btn-primary w-100 py-3 fw-semibold rounded-3 d-flex justify-content-center align-items-center gap-2">
-                        <Send size={20} /> Send Message
-                      </button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+        {/* Main Content */}
+        <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
+            {/* Contact Form */}
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "1rem",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                padding: "2rem",
+              }}
+            >
+              <h2 style={{ fontWeight: 700, marginBottom: "1rem", color: "#1f2937" }}>
+                Send us a Message
+              </h2>
+              <p style={{ color: "#6c757d", marginBottom: "1.5rem" }}>
+                Fill out the form below and we'll get back to you as soon as possible.
+              </p>
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Full Name *"
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    border: "1px solid #ced4da",
+                    marginBottom: "1rem",
+                  }}
+                />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Email Address *"
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    border: "1px solid #ced4da",
+                    marginBottom: "1rem",
+                  }}
+                />
+                <input
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="Subject *"
+                  required
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    border: "1px solid #ced4da",
+                    marginBottom: "1rem",
+                  }}
+                />
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Your Message *"
+                  required
+                  rows={6}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem",
+                    borderRadius: "0.75rem",
+                    border: "1px solid #ced4da",
+                    marginBottom: "1rem",
+                  }}
+                ></textarea>
+                <button
+                  type="submit"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "0.5rem",
+                    width: "100%",
+                    padding: "0.75rem",
+                    backgroundColor: "#0d6efd",
+                    color: "#fff",
+                    fontWeight: 600,
+                    border: "none",
+                    borderRadius: "0.75rem",
+                    cursor: "pointer",
+                  }}
+                >
+                  <Send size={20} /> Send Message
+                </button>
+              </form>
             </div>
-          </div>
 
-          {/* Contact Info & Map */}
-          <div className="col-lg-4">
-            <div className="card border-0 shadow-lg rounded-4 mb-4">
-              <div className="card-body p-4">
-                <h4 className="fw-bold text-dark mb-4">Contact Information</h4>
-
-                <div className="d-flex align-items-start mb-4">
-                  <div className="bg-light rounded-3 p-3 me-3">
-                    <Mail className="text-primary" />
+            {/* Contact Info */}
+            <div
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "1rem",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                padding: "2rem",
+              }}
+            >
+              <h4 style={{ fontWeight: 700, marginBottom: "1rem", color: "#1f2937" }}>
+                Contact Information
+              </h4>
+              {[
+                {
+                  icon: <Mail className="text-primary" />,
+                  title: "Email",
+                  lines: ["support@avyukta.com", "info@avyukta.com"],
+                },
+                {
+                  icon: <Phone className="text-success" />,
+                  title: "Phone",
+                  lines: ["+91 98765 43210", "+91 87654 32109"],
+                },
+                {
+                  icon: <MapPin className="text-danger" />,
+                  title: "Address",
+                  lines: ["123 Avyukta Tower, MG Road,", "New Delhi, India 110001"],
+                },
+                {
+                  icon: <Clock className="text-warning" />,
+                  title: "Business Hours",
+                  lines: ["Mon - Fri: 9:00 AM - 6:00 PM", "Sat: 10:00 AM - 4:00 PM", "Sun: Closed"],
+                },
+              ].map((item, index) => (
+                <div key={index} style={{ display: "flex", gap: "1rem", marginBottom: "1rem", alignItems: "flex-start" }}>
+                  <div
+                    style={{
+                      width: 50,
+                      height: 50,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "#f1f5f9",
+                      borderRadius: "0.75rem",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {item.icon}
                   </div>
                   <div>
-                    <h6 className="fw-semibold text-dark mb-1">Email</h6>
-                    <p className="text-muted mb-0">support@avyukta.com</p>
-                    <p className="text-muted">info@avyukta.com</p>
+                    <h6 style={{ fontWeight: 600, marginBottom: "0.25rem", color: "#1f2937" }}>
+                      {item.title}
+                    </h6>
+                    {item.lines.map((line, i) => (
+                      <p key={i} style={{ margin: 0, color: "#6c757d", fontSize: "0.875rem" }}>
+                        {line}
+                      </p>
+                    ))}
                   </div>
                 </div>
-
-                <div className="d-flex align-items-start mb-4">
-                  <div className="bg-light rounded-3 p-3 me-3">
-                    <Phone className="text-success" />
-                  </div>
-                  <div>
-                    <h6 className="fw-semibold text-dark mb-1">Phone</h6>
-                    <p className="text-muted mb-0">+91 98765 43210</p>
-                    <p className="text-muted">+91 87654 32109</p>
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-start mb-4">
-                  <div className="bg-light rounded-3 p-3 me-3">
-                    <MapPin className="text-danger" />
-                  </div>
-                  <div>
-                    <h6 className="fw-semibold text-dark mb-1">Address</h6>
-                    <p className="text-muted mb-0">123 Avyukta Tower, MG Road,</p>
-                    <p className="text-muted">New Delhi, India 110001</p>
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-start">
-                  <div className="bg-light rounded-3 p-3 me-3">
-                    <Clock className="text-warning" />
-                  </div>
-                  <div>
-                    <h6 className="fw-semibold text-dark mb-1">Business Hours</h6>
-                    <p className="text-muted mb-0">Mon - Fri: 9:00 AM - 6:00 PM</p>
-                    <p className="text-muted mb-0">Sat: 10:00 AM - 4:00 PM</p>
-                    <p className="text-muted">Sun: Closed</p>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Map */}
-            <div className="card border-0 shadow-lg rounded-4 overflow-hidden">
-              <div className="card-body p-3">
-                <h5 className="fw-bold text-dark mb-2">Find Us</h5>
-                <p className="text-muted mb-3">Visit our office location</p>
-                <div className="ratio ratio-4x3 rounded-3 overflow-hidden">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14012.890033074412!2d77.21672175!3d28.6328726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce2b32780d2a9%3A0xdee50d792f2d1a86!2sConnaught%20Place%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1685806191260!5m2!1sen!2sin"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              </div>
+            <div
+              style={{
+                borderRadius: "1rem",
+                overflow: "hidden",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+                marginTop: "1rem",
+              }}
+            >
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14012.890033074412!2d77.21672175!3d28.6328726!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390ce2b32780d2a9%3A0xdee50d792f2d1a86!2sConnaught%20Place%2C%20New%20Delhi!5e0!3m2!1sen!2sin!4v1685806191260!5m2!1sen!2sin"
+                style={{ width: "100%", height: 300, border: 0 }}
+                loading="lazy"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="mt-5 pt-5">
-          <div className="text-center mb-5">
-            <h2 className="fw-bold text-dark">Frequently Asked Questions</h2>
-            <p className="text-muted">Quick answers to common questions</p>
+        <div style={{ marginTop: "3rem" }}>
+          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
+            <h2 style={{ fontWeight: 700, color: "#1f2937" }}>Frequently Asked Questions</h2>
+            <p style={{ color: "#6c757d" }}>Quick answers to common questions</p>
           </div>
-
-          <div className="row g-4">
-            <div className="col-md-4">
-              <div className="card border-0 shadow-sm h-100 rounded-4">
-                <div className="card-body">
-                  <h5 className="fw-semibold text-dark mb-2">How quickly do you respond?</h5>
-                  <p className="text-muted small">We typically respond to all inquiries within 24 hours during business days.</p>
-                </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+            {[
+              {
+                question: "How quickly do you respond?",
+                answer: "We typically respond to all inquiries within 24 hours during business days.",
+              },
+              {
+                question: "Do you offer phone support?",
+                answer: "Yes! You can reach us at +91 98765 43210 during business hours.",
+              },
+              {
+                question: "What's your response time?",
+                answer: "Most queries are answered within 2–4 hours during business hours.",
+              },
+            ].map((faq, index) => (
+              <div
+                key={index}
+                style={{
+                  flex: "1 1 300px",
+                  backgroundColor: "#fff",
+                  borderRadius: "1rem",
+                  boxShadow: "0 4px 15px rgba(0,0,0,0.05)",
+                  padding: "1.5rem",
+                }}
+              >
+                <h5 style={{ fontWeight: 600, marginBottom: "0.5rem", color: "#1f2937" }}>
+                  {faq.question}
+                </h5>
+                <p style={{ margin: 0, color: "#6c757d", fontSize: "0.875rem" }}>{faq.answer}</p>
               </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card border-0 shadow-sm h-100 rounded-4">
-                <div className="card-body">
-                  <h5 className="fw-semibold text-dark mb-2">Do you offer phone support?</h5>
-                  <p className="text-muted small">Yes! You can reach us at +91 98765 43210 during business hours.</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="card border-0 shadow-sm h-100 rounded-4">
-                <div className="card-body">
-                  <h5 className="fw-semibold text-dark mb-2">What's your response time?</h5>
-                  <p className="text-muted small">Most queries are answered within 2–4 hours during business hours.</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

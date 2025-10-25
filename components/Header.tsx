@@ -66,7 +66,7 @@ const [showDropdown, setShowDropdown] = useState(false);
             <Link href="/" className="flex-shrink-0">
               <Image
                 src="/logo_new.png"
-                width={140}
+                width={200}
                 height={40}
                 alt="Company logo"
                 className="h-auto cursor-pointer hover:opacity-90 transition-all duration-200"
