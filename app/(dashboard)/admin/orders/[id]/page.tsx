@@ -146,10 +146,12 @@ const AdminSingleOrder = () => {
   };
 
   return (
-    <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
+    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
       <DashboardSidebar />
       <div className="flex flex-col gap-y-7 xl:ml-5 w-full max-xl:px-5">
+        <div className="pb-6 border-b-2 border-gray-200 mb-6">
         <h1 className="text-3xl font-semibold">Order details</h1>
+        </div>
         <div className="mt-5">
           <label className="w-full">
             <div>
@@ -158,7 +160,7 @@ const AdminSingleOrder = () => {
             </div>
           </label>
         </div>
-        <div className="flex gap-x-2 max-sm:flex-col">
+        <div className="flex gap-x-10 max-sm:flex-col">
           <div>
             <label className="form-control w-full max-w-xs">
               <div className="label">
@@ -187,9 +189,7 @@ const AdminSingleOrder = () => {
               />
             </label>
           </div>
-        </div>
-
-        <div>
+          <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Phone number:</span>
@@ -202,7 +202,6 @@ const AdminSingleOrder = () => {
             />
           </label>
         </div>
-
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
@@ -216,8 +215,16 @@ const AdminSingleOrder = () => {
             />
           </label>
         </div>
+        </div>
 
-        <div>
+        
+
+        
+
+        
+        <div className="flex gap-x-10 max-sm:flex-col">
+
+          <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Company (optional):</span>
@@ -231,7 +238,6 @@ const AdminSingleOrder = () => {
           </label>
         </div>
 
-        <div className="flex gap-x-2 max-sm:flex-col">
           <div>
             <label className="form-control w-full max-w-xs">
               <div className="label">
@@ -261,9 +267,6 @@ const AdminSingleOrder = () => {
               />
             </label>
           </div>
-        </div>
-
-        <div className="flex gap-x-2 max-sm:flex-col">
           <div>
             <label className="form-control w-full max-w-xs">
               <div className="label">
@@ -277,6 +280,10 @@ const AdminSingleOrder = () => {
               />
             </label>
           </div>
+        </div>
+
+        <div className="flex gap-x-10 max-sm:flex-col">
+          
 
           <div>
             <label className="form-control w-full max-w-xs">
@@ -294,7 +301,7 @@ const AdminSingleOrder = () => {
             </label>
           </div>
 
-          <div>
+          <div >
             <label className="form-control w-full max-w-xs">
               <div className="label">
                 <span className="label-text">Postal Code:</span>
@@ -309,9 +316,7 @@ const AdminSingleOrder = () => {
               />
             </label>
           </div>
-        </div>
-
-        <div>
+           <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Order status</span>
@@ -335,30 +340,32 @@ const AdminSingleOrder = () => {
             </select>
           </label>
         </div>
-        <div>
-          <label className="form-control">
-            <div className="label">
-              <span className="label-text">Order notice:</span>
-            </div>
-            <textarea
-              className="textarea textarea-bordered h-24"
-              value={order?.orderNotice || ""}
-              onChange={(e) =>
-                setOrder({ ...order, orderNotice: e.target.value })
-              }
-            ></textarea>
-          </label>
         </div>
-        <div>
-          {orderProducts && orderProducts.length > 0 ? (
+
+       <div className="flex justify-start items-center gap-x-10 max-sm:flex-col">
+        <div className="w-full lg:w-1/2">
+  <label className="form-control">
+    <div className="label">
+      <span className="label-text">Order notice:</span>
+    </div>
+    <textarea
+      className="textarea textarea-bordered h-24"
+      value={order?.orderNotice || ""}
+      onChange={(e) =>
+        setOrder({ ...order, orderNotice: e.target.value })
+      }
+    ></textarea>
+  </label>
+</div>
+         {orderProducts && orderProducts.length > 0 ? (
             orderProducts.map((product) => (
-            <div className="flex items-center gap-x-4" key={product?.id}>
+            <div className="flex items-center gap-x-8 mt-8" key={product?.id}>
               <Image
                 src={product?.product?.mainImage ? `/${product?.product?.mainImage}` : "/product_placeholder.jpg"}
                 alt={product?.product?.title}
                 width={50}
                 height={50}
-                className="w-auto h-auto"
+                className="w-auto h-auto rounded-[10px]"
               />
               <div>
                 <Link href={`/product/${product?.product?.slug}`}>
@@ -373,30 +380,40 @@ const AdminSingleOrder = () => {
           ) : (
             <p className="text-gray-500">No products found for this order.</p>
           )}
-          <div className="flex flex-col gap-y-2 mt-10">
+
+          <div className="flex flex-col gap-y-1 mt-3">
             <p className="text-2xl">Subtotal: ${order?.total}</p>
             <p className="text-2xl">Tax 20%: ${order?.total / 5}</p>
-            <p className="text-2xl">Shipping: $5</p>
+            <p className="text-2xl">Shipping: 5</p>
             <p className="text-3xl font-semibold">
               Total: ${order?.total + order?.total / 5 + 5}
             </p>
           </div>
-          <div className="flex gap-x-2 max-sm:flex-col mt-5">
-            <button
-              type="button"
-              className="uppercase bg-blue-500 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2"
-              onClick={updateOrder}
-            >
-              Update order
-            </button>
-            <button
-              type="button"
-              className="uppercase bg-red-600 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
-              onClick={deleteOrder}
-            >
-              Delete order
-            </button>
-          </div>
+       </div>
+       
+
+        <div className="flex justify-end items-center gap-x-10 max-sm:flex-col">
+         
+          
+    <div className="flex justify-center items-center gap-x-4 max-sm:flex-col mt-5">
+  <button
+    type="button"
+    className="uppercase bg-blue-500 w-auto inline-flex justify-center items-center px-5 py-2 text-sm font-semibold text-white border border-gray-300 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all"
+    onClick={updateOrder}
+  >
+    Update Order
+  </button>
+
+  <button
+    type="button"
+    className="uppercase bg-red-600 w-auto inline-flex justify-center items-center px-5 py-2 text-sm font-semibold text-white border border-gray-300 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-400 transition-all"
+    onClick={deleteOrder}
+  >
+    Delete Order
+  </button>
+</div>
+
+
         </div>
       </div>
     </div>

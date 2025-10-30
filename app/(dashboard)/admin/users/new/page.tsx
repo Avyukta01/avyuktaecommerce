@@ -65,159 +65,83 @@ const DashboardCreateNewUser = () => {
     }
   };
 
-  return (
-    <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
-      <DashboardSidebar />
-      <div className="flex flex-col gap-y-7 xl:pl-5 max-xl:px-5 w-full">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Two Column Vertical Form</h1>
-          <p className="text-gray-600">Personal Details</p>
-        </div>
-        
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Name:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter name"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Password:</label>
-                <input
-                  type="password"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter password"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">State:</label>
-                <select className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Select State</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Your Message:</label>
-                <textarea
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 h-32"
-                  placeholder="Enter message"
-                ></textarea>
-              </div>
-            </div>
+ return (
+  <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
+    <DashboardSidebar />
+    
+    <div className="flex flex-col items-center justify-center xl:pl-5 max-xl:px-5 w-full py-8">
+      {/* Professional Card */}
+      <div className="w-full max-w-md bg-white shadow-lg rounded-lg border border-gray-200 p-8">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+          Add New User
+        </h1>
 
-            {/* Right Column */}
-            <div className="space-y-6">
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">First Name:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter first name"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Last Name:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter last name"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Email:</label>
-                <input
-                  type="email"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={userInput.email}
-                  onChange={(e) =>
-                    setUserInput({ ...userInput, email: e.target.value })
-                  }
-                  placeholder="Enter email"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Phone:</label>
-                <input
-                  type="tel"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter phone number"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Address line:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter address"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">Country:</label>
-                <select className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                  <option value="">Select Country</option>
-                  <option value="india">India</option>
-                  <option value="usa">USA</option>
-                  <option value="uk">UK</option>
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">State/Province:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter state/province"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">ZIP code:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter ZIP code"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium mb-2">City:</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter city"
-                />
-              </div>
-            </div>
-          </form>
-          
-          {/* Submit Button */}
-          <div className="flex justify-end mt-8">
-            <button
-              type="button"
-              className="bg-orange-500 text-white px-8 py-3 rounded-md font-medium hover:bg-orange-600 transition-colors"
-              onClick={addNewUser}
-            >
-              Submit
-            </button>
-          </div>
+        {/* Email Field */}
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
+          <input
+            type="email"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="user@example.com"
+            value={userInput.email}
+            onChange={(e) =>
+              setUserInput({ ...userInput, email: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Password Field */}
+        <div className="mb-5">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <input
+            type="password"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            placeholder="••••••••"
+            value={userInput.password}
+            onChange={(e) =>
+              setUserInput({ ...userInput, password: e.target.value })
+            }
+          />
+        </div>
+
+        {/* Role Select */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            User Role
+          </label>
+          <select
+            className="w-full px-4 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            value={userInput.role}
+            onChange={(e) =>
+              setUserInput({ ...userInput, role: e.target.value })
+            }
+          >
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+
+        {/* Action Button */}
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="px-6 py-2.5 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            onClick={addNewUser}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+            </svg>
+            Create User
+          </button>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DashboardCreateNewUser;

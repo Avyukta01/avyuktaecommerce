@@ -149,26 +149,11 @@ const AddNewProduct = () => {
   return (
     <AdminLayout 
       title="Add New Product" 
-      description="Create a new product for your e-commerce store"
-      breadcrumbs={[
-        { label: "Dashboard", href: "/admin" },
-        { label: "Products", href: "/admin/products" },
-        { label: "Add New Product" }
-      ]}
+      
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-            >
-              <FaArrowLeft size={16} />
-              Back
-            </button>
-          </div>
-        </div>
+        
 
         {/* Form */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">

@@ -239,3 +239,6 @@
 ::1 - - [24/Oct/2025:06:47:19 +0000] "GET /api/bulk-upload HTTP/1.1" 500 99 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=Ioc2PgZm userId=anonymous
 ::1 - - [24/Oct/2025:06:49:46 +0000] "POST /api/bulk-upload HTTP/1.1" 500 99 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=OqzFxICd userId=anonymous
 ::1 - - [24/Oct/2025:06:50:00 +0000] "POST /api/bulk-upload HTTP/1.1" 500 99 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=dQE4OaVk userId=anonymous
+::1 - - [29/Oct/2025:05:07:46 +0000] "GET /api/products HTTP/1.1" 500 97 "-" "node" reqId=9szHWYwy userId=anonymous
+::1 - - [29/Oct/2025:05:16:47 +0000] "GET /api/products HTTP/1.1" 500 97 "-" "node" reqId=RkZr11SW userId=anonymous
+::1 - - [29/Oct/2025:05:18:14 +0000] "GET /api/products HTTP/1.1" 500 97 "-" "node" reqId=Of2jbrxb userId=anonymous

@@ -6,6 +6,12 @@ import Link from "next/link";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Home, People } from "@mui/icons-material";
 
+interface User {
+  id: number;
+  email: string;
+  role: string;
+}
+
 const DashboardUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,7 +20,6 @@ const DashboardUsers = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
   useEffect(() => {
-    // sending API request for all users
     apiClient.get("/api/users")
       .then((res) => {
         if (!res.ok) {
@@ -27,7 +32,6 @@ const DashboardUsers = () => {
       })
       .catch((err) => {
         console.error("Error fetching users:", err);
-        // You could add toast notification here if needed
       })
       .finally(() => setIsLoading(false));
   }, []);
@@ -55,161 +59,213 @@ const DashboardUsers = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  // CSV Download
+  const handleDownload = () => {
+    const headers = "ID,Email,Role\n";
+    const rows = filteredUsers
+      .map((u) => `${u.id},"${u.email}","${u.role}"`)
+      .join("\n");
+    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
+
+    const link = document.createElement("a");
+    link.href = csvContent;
+    link.download = "users-table.csv";
+    link.click();
+  };
+
+  // Refresh Handler
+  const handleRefresh = () => {
+    setIsLoading(true);
+    apiClient.get("/api/users")
+      .then((res) => res.json())
+      .then((data) => setUsers(data))
+      .catch((err) => console.error("Error fetching users:", err))
+      .finally(() => setIsLoading(false));
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="w-full bg-white rounded-lg shadow-md p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Data Tables</h1>
-          <p className="text-gray-600">Default Datatable</p>
+    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+      <div className="pb-6 pt-4 border-b-2 border-gray-200 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">All Users</h1>
+      </div>
+
+      {/* Controls */}
+      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700">Rows per page:</span>
+          <select
+            value={itemsPerPage}
+            onChange={(e) => {
+              setItemsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+            className="border border-gray-300 rounded-md px-6 py-2 text-sm font-medium text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
         </div>
 
-        {/* Controls */}
-        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Row Per Page</span>
-            <select
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-              className="border border-gray-300 rounded px-2 py-1 text-sm"
-            >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-            </select>
-            <span className="text-sm text-gray-600">Entries</span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <input
-              type="text"
-              placeholder="Search"
-              className="border border-gray-300 rounded px-3 py-1 text-sm"
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-            <Link href="/admin/users/new">
-              <CustomButton
-                buttonType="button"
-                customWidth="110px"
-                paddingX={10}
-                paddingY={5}
-                textSize="base"
-                text="Add new user"
-              />
-            </Link>
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                  <input type="checkbox" className="rounded" />
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                  Email
-                  <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                  </svg>
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                  Role
-                  <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                  </svg>
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {isLoading ? (
-                Array.from({ length: 5 }).map((_, index) => (
-                  <tr key={index} className="animate-pulse">
-                    <td className="px-4 py-4 border-b">
-                      <div className="w-4 h-4 bg-gray-200 rounded"></div>
-                    </td>
-                    <td className="px-4 py-4 border-b">
-                      <div className="w-32 h-4 bg-gray-200 rounded"></div>
-                    </td>
-                    <td className="px-4 py-4 border-b">
-                      <div className="w-16 h-4 bg-gray-200 rounded"></div>
-                    </td>
-                    <td className="px-4 py-4 border-b">
-                      <div className="w-20 h-6 bg-gray-200 rounded"></div>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                currentUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-4 border-b">
-                      <input type="checkbox" className="rounded" />
-                    </td>
-                    <td className="px-4 py-4 border-b text-sm text-gray-900">
-                      {user?.email}
-                    </td>
-                    <td className="px-4 py-4 border-b text-sm text-gray-900">
-                      {user?.role}
-                    </td>
-                    <td className="px-4 py-4 border-b">
-                      <Link
-                        href={`/admin/users/${user?.id}`}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        View Details
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
-          <span className="text-sm text-gray-600">
-            Showing <b>{indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredUsers.length)}</b> of <b>{filteredUsers.length}</b> entries
-          </span>
-          
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => paginate(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              &lt;
+        <div className="flex items-center gap-3">
+          <input
+            type="text"
+            placeholder="Search users..."
+            className="border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 placeholder-gray-500 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+          <Link href="/admin/users/new">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+              </svg>
+              Add User
             </button>
-            {Array.from({ length: totalPages }, (_, i) => (
-              <button
-                key={i + 1}
-                onClick={() => paginate(i + 1)}
-                className={`px-3 py-1 border rounded text-sm ${
-                  currentPage === i + 1
-                    ? "bg-orange-500 text-white border-orange-500"
-                    : "border-gray-300 hover:bg-gray-100"
-                }`}
+          </Link>
+          <button
+            onClick={handleDownload}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+            Download
+          </button>
+          
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gradient-to-r from-blue-600 to-blue-700">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
+                <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
+              </th>
+              <th
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
               >
-                {i + 1}
-              </button>
-            ))}
+                <div className="flex items-center gap-2">
+                  Email
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
+              </th>
+              <th
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  Role
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+
+          <tbody className="bg-white divide-y divide-gray-200">
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <tr key={index} className="animate-pulse hover:bg-gray-50">
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <div className="w-4 h-4 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <div className="w-32 h-4 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <div className="w-20 h-4 bg-gray-200 rounded"></div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="w-20 h-6 bg-gray-200 rounded"></div>
+                  </td>
+                </tr>
+              ))
+            ) : currentUsers.length > 0 ? (
+              currentUsers.map((user) => (
+                <tr key={user.id} className="hover:bg-blue-50 transition-colors">
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-medium">
+                    {user?.email}
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm">
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
+                      user.role === "admin" 
+                        ? "bg-purple-100 text-purple-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}>
+                      {user?.role}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Link
+                      href={`/admin/users/${user?.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium transition-colors"
+                    >
+                      View Details
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={4} className="text-center py-8 text-gray-500">
+                  No users found
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-6 p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <span className="text-sm text-gray-700 font-medium">
+          Showing{" "}
+          <span className="font-semibold text-gray-900">
+            {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredUsers.length)}
+          </span>{" "}
+          of <span className="font-semibold text-gray-900">{filteredUsers.length}</span> entries
+        </span>
+
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => paginate(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
+          >
+            Less than
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
             <button
-              onClick={() => paginate(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              key={i + 1}
+              onClick={() => paginate(i + 1)}
+              className={`px-3 py-2 border rounded-md text-sm font-medium transition-colors ${
+                currentPage === i + 1
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
+              }`}
             >
-              &gt;
+              {i + 1}
             </button>
-          </div>
+          ))}
+          <button
+            onClick={() => paginate(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
+          >
+            Greater than
+          </button>
         </div>
       </div>
     </div>

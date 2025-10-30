@@ -122,56 +122,62 @@ const AdminOrders = () => {
   };
 
   return (
-    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-2xl p-6 border border-gray-100">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Data Tables</h1>
-        <p className="text-gray-600">Default Datatable</p>
+    <div className="xl: w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+      <div className="pb-6 pt-4 border-b-2 border-gray-200 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">All Orders</h1>
+        {/* <p className="text-sm text-gray-600">D</p> */}
       </div>
 
       {/* Controls */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Row Per Page</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-gray-700">Rows per page:</span>
           <select
             value={itemsPerPage}
             onChange={(e) => {
-              setItemsPerPage(Number(e.target.value));
-              setCurrentPage(1);
+              setItemsPerPage(Number(e.target.value))
+              setCurrentPage(1)
             }}
-            className="border border-gray-300 rounded px-2 py-1 text-sm"
+            className="border border-gray-300 rounded-md px-6 py-2 text-sm font-medium text-gray-700 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={25}>25</option>
             <option value={50}>50</option>
           </select>
-          <span className="text-sm text-gray-600">Entries</span>
         </div>
-        
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center gap-3">
           <input
             type="text"
-            placeholder="Search"
-            className="border border-gray-300 rounded px-3 py-1 text-sm"
+            placeholder="Search orders..."
+            className="border border-gray-300 rounded-md px-4 py-2 text-sm text-gray-700 placeholder-gray-500 bg-white hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={searchTerm}
             onChange={handleSearch}
           />
           <button
             onClick={handleDownload}
-            className="px-5 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-700 active:scale-95 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
             </svg>
             Download
           </button>
-          <button 
-            className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
             onClick={fetchOrders}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                clipRule="evenodd"
+              />
             </svg>
             Refresh
           </button>
@@ -180,129 +186,132 @@ const AdminOrders = () => {
 
       {/* Error message */}
       {error && (
-        <div className="bg-red-100 text-red-700 border border-red-300 rounded-lg px-4 py-3 mb-4">
-          {error}
-        </div>
+        <div className="bg-red-50 text-red-700 border border-red-200 rounded-md px-4 py-3 mb-4 text-sm">{error}</div>
       )}
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border-collapse">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                <input type="checkbox" className="rounded" />
+      <div className="overflow-x-auto rounded-lg border border-gray-200">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gradient-to-r from-blue-600 to-blue-700">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
+                <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b cursor-pointer hover:bg-gray-200"
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
                 onClick={() => handleSort("id")}
               >
-                Order ID
-                <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                </svg>
+                <div className="flex items-center gap-2">
+                  Order ID
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b cursor-pointer hover:bg-gray-200"
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
                 onClick={() => handleSort("name")}
               >
-                Name & Country
-                <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                </svg>
+                <div className="flex items-center gap-2">
+                  Name & Country
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b cursor-pointer hover:bg-gray-200"
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
                 onClick={() => handleSort("status")}
               >
-                Status
-                <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                </svg>
+                <div className="flex items-center gap-2">
+                  Status
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b cursor-pointer hover:bg-gray-200"
+                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
                 onClick={() => handleSort("total")}
               >
-                Subtotal
-                <svg className="inline-block ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                </svg>
+                <div className="flex items-center gap-2">
+                  Subtotal
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                  </svg>
+                </div>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
                 Date
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                Actions
-              </th>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
 
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (
               Array.from({ length: 5 }).map((_, index) => (
-                <tr key={index} className="animate-pulse">
-                  <td className="px-4 py-4 border-b">
+                <tr key={index} className="animate-pulse hover:bg-gray-50">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-4 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-16 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-32 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-20 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-16 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <div className="w-24 h-4 bg-gray-200 rounded"></div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4">
                     <div className="w-20 h-6 bg-gray-200 rounded"></div>
                   </td>
                 </tr>
               ))
             ) : currentOrders.length > 0 ? (
-              currentOrders.map((order, index) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 border-b">
-                    <input type="checkbox" className="rounded" />
+              currentOrders.map((order) => (
+                <tr key={order.id} className="hover:bg-blue-50 transition-colors">
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
                   </td>
-                  <td className="px-4 py-4 border-b text-sm text-gray-900 font-semibold">
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-semibold">
                     #{order.id}
                   </td>
-                  <td className="px-4 py-4 border-b text-sm text-gray-900">
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm">
                     <div className="flex flex-col">
-                      <span className="font-medium">{order.name}</span>
+                      <span className="font-medium text-gray-900">{order.name}</span>
                       <span className="text-xs text-gray-500">{order.country}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4 border-r border-gray-200">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                      className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
                         order.status === "Delivered"
                           ? "bg-green-100 text-green-800"
                           : order.status === "Pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
                       }`}
                     >
                       {order.status}
                     </span>
                   </td>
-                  <td className="px-4 py-4 border-b text-sm text-gray-900 font-semibold">
-                    ₹{order.total}
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-semibold">
+                    ₹{order.total.toLocaleString()}
                   </td>
-                  <td className="px-4 py-4 border-b text-sm text-gray-900">
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-700">
                     {new Date(order.dateTime).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-4 border-b">
+                  <td className="px-6 py-4">
                     <Link
                       href={`/admin/orders/${order.id}`}
-                      className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium transition-colors"
                     >
                       View Details
                     </Link>
@@ -311,7 +320,7 @@ const AdminOrders = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="text-center py-6 text-gray-500 border-b">
+                <td colSpan={7} className="text-center py-8 text-gray-500">
                   No orders found
                 </td>
               </tr>
@@ -320,17 +329,20 @@ const AdminOrders = () => {
         </table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex flex-col md:flex-row justify-between items-center mt-6 gap-4">
-        <span className="text-sm text-gray-600">
-          Showing <b>{indexOfFirstItem + 1} - {Math.min(indexOfLastItem, filteredOrders.length)}</b> of <b>{filteredOrders.length}</b> entries
+      <div className="mt-6  p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+        <span className="text-sm text-gray-700 font-medium">
+          Showing{" "}
+          <span className="font-semibold text-gray-900">
+            {indexOfFirstItem + 1} - {Math.min(indexOfLastItem, sortedOrders.length)}
+          </span>{" "}
+          of <span className="font-semibold text-gray-900">{sortedOrders.length}</span> entries
         </span>
-        
+
         <div className="flex items-center gap-1">
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
           >
             &lt;
           </button>
@@ -338,10 +350,10 @@ const AdminOrders = () => {
             <button
               key={i + 1}
               onClick={() => paginate(i + 1)}
-              className={`px-3 py-1 border rounded text-sm ${
+              className={`px-3 py-2 border rounded-md text-sm font-medium transition-colors ${
                 currentPage === i + 1
-                  ? "bg-orange-500 text-white border-orange-500"
-                  : "border-gray-300 hover:bg-gray-100"
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "border-gray-300 text-gray-700 bg-white hover:bg-gray-50"
               }`}
             >
               {i + 1}
@@ -350,7 +362,7 @@ const AdminOrders = () => {
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors"
           >
             &gt;
           </button>

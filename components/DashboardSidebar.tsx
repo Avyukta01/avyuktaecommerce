@@ -38,13 +38,26 @@ const DashboardSidebar = () => {
       className="xl:w-[260px] max-xl:w-full h-screen fixed top-0 left-0 bg-white shadow-lg border-r border-slate-200 transition-all duration-300 flex flex-col justify-between overflow-y-auto z-50"
     >
       {/* Modern Sidebar Header */}
-      <div className="p-6 border-b border-slate-200 sticky top-0 z-10 bg-white">
-        {isImageLoading && (
-          <div className="w-full h-16 bg-gray-300 animate-pulse rounded-lg flex items-center justify-center">
-            <div className="w-3/4 h-10 bg-gray-400 rounded"></div>
-          </div>
-        )}
-      </div>
+<div className="p-6 border-b border-slate-200 sticky top-0 z-10 bg-white flex items-center justify-center">
+  {isImageLoading && (
+    <div className="w-full h-16 bg-gray-300 animate-pulse rounded-lg flex items-center justify-center">
+      <div className="w-3/4 h-10 bg-gray-400 rounded" />
+    </div>
+  )}
+
+  {!isImageLoading && !hasImageError && (
+    <img
+      src="/avyukta_logo_new.png"
+      alt="logo"
+      className="h-10 w-auto object-contain transition-opacity duration-300"
+    />
+  )}
+
+  {hasImageError && (
+    <div className="text-red-500 text-sm">Logo failed to load</div>
+  )}
+</div>
+
 
       {/* Modern Navigation Links */}
       <div className="flex flex-col flex-1 px-4 py-2">
@@ -153,7 +166,7 @@ const DashboardSidebar = () => {
           </div>
         </Link>
 
-        <Link href="/admin/settings">
+        {/* <Link href="/admin/settings">
           <div className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${
             pathname === "/admin/settings" 
               ? "bg-blue-600 text-white shadow-sm" 
@@ -166,7 +179,7 @@ const DashboardSidebar = () => {
             }`} />
             <span>Settings</span>
           </div>
-        </Link>
+        </Link> */}
       </div>
 
       {/* Modern Footer */}
