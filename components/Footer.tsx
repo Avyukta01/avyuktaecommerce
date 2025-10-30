@@ -1,25 +1,19 @@
 "use client";
 
-"use client";
-
 import { navigation } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
 import { usePathname } from "next/navigation";
-<<<<<<< HEAD
-=======
-import { Facebook, Twitter, Instagram } from "lucide-react"; // <-- Added icons
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+import { Facebook, Twitter, Instagram } from "lucide-react"; // ✅ Added import
 
 const Footer = () => {
   const pathname = usePathname();
+
+  // Hide footer on admin pages
   if (pathname.startsWith("/admin")) {
     return null;
   }
-<<<<<<< HEAD
-=======
 
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
   return (
     <footer
       className="bg-gradient-to-b from-gray-50 to-white border-t border-gray-200"

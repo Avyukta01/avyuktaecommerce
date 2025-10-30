@@ -82,7 +82,15 @@ const IntroducingSection: React.FC = () => {
               {/* Image */}
               <div className="relative w-full h-40 sm:h-44 flex items-center justify-center overflow-hidden bg-gray-50">
                 <Image
-                  src={product.mainImage || "/placeholder.png"}
+                  src={
+    product.mainImage
+      ? product.mainImage.startsWith("http")
+        ? product.mainImage
+        : product.mainImage.startsWith("/")
+        ? product.mainImage
+        : `/${product.mainImage}`
+      : "/placeholder.png"
+  }
                   alt={product.title}
                   width={160}
                   height={160}
@@ -117,7 +125,7 @@ const IntroducingSection: React.FC = () => {
           ))
         ) : (
           <div className="col-span-full text-center text-gray-700 py-20 text-lg font-semibold">
-            Loading products...
+            NO products...
           </div>
         )}
       </div>

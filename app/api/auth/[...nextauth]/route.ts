@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import NextAuth from "next-auth";
+import NextAuth, { type NextAuthOptions } from "next-auth";
 import type { User as AuthUser } from "next-auth";
-=======
-import NextAuth, { NextAuthOptions } from "next-auth";
-import { Account, User as AuthUser } from "next-auth";
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -12,12 +8,26 @@ import bcrypt from "bcryptjs";
 import prisma from "@/utils/db";
 import { nanoid } from "nanoid";
 
-<<<<<<< HEAD
-export const authOptions = {
-=======
+// Define the shape of your JWT token
+interface JWT {
+  role?: string;
+  id?: string;
+  iat?: number;
+  [key: string]: any;
+}
+
+// Define the shape of your session
+interface Session {
+  user: {
+    id?: string;
+    email?: string;
+    role?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 export const authOptions: NextAuthOptions = {
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
-  // Configure one or more authentication providers
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -52,26 +62,15 @@ export const authOptions: NextAuthOptions = {
         return null;
       },
     }),
-    // Uncomment and configure these providers as needed
-    // GithubProvider({
-    //   clientId: process.env.GITHUB_ID!,
-    //   clientSecret: process.env.GITHUB_SECRET!,
-    // }),
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // }),
   ],
   callbacks: {
-    async signIn({ user, account }: { user: AuthUser; account: any }) {
+    async signIn({ user, account }: { user: AuthUser; account: any }): Promise<boolean> {
       if (account?.provider === "credentials") {
         return true;
       }
       
-      // Handle OAuth providers
       if (account?.provider === "github" || account?.provider === "google") {
         try {
-          // Check if user exists in database
           const existingUser = await prisma.user.findFirst({
             where: {
               email: user.email!,
@@ -79,13 +78,11 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!existingUser) {
-            // Create new user for OAuth providers
             await prisma.user.create({
               data: {
                 id: nanoid(),
                 email: user.email!,
                 role: "user",
-                // OAuth users don't have passwords
                 password: null,
               },
             });
@@ -99,44 +96,44 @@ export const authOptions: NextAuthOptions = {
       
       return true;
     },
-    async jwt({ token, user }) {
+
+    async jwt({ token, user }: { token: JWT; user?: AuthUser }): Promise<JWT> {
       if (user) {
         token.role = user.role;
         token.id = user.id;
-        token.iat = Math.floor(Date.now() / 1000); // Issued at time
+        token.iat = Math.floor(Date.now() / 1000);
       }
       
-      // Check if token is expired (15 minutes)
       const now = Math.floor(Date.now() / 1000);
       const tokenAge = now - (token.iat as number);
-      const maxAge = 15 * 60; // 15 minutes
+      const maxAge = 15 * 60;
       
       if (tokenAge > maxAge) {
-        // Token expired, return empty object to force re-authentication
         return {};
       }
       
       return token;
     },
-    async session({ session, token }) {
+
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       if (token) {
-        session.user.role = token.role as string;
-        session.user.id = token.id as string;
+        session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },
   },
   pages: {
     signIn: '/login',
-    error: '/login', // Redirect to login page on auth errors
+    error: '/login',
   },
   session: {
     strategy: "jwt",
-    maxAge: 15 * 60, // 15 minutes in seconds
-    updateAge: 5 * 60, // Update session every 5 minutes
+    maxAge: 15 * 60,
+    updateAge: 5 * 60,
   },
   jwt: {
-    maxAge: 15 * 60, // 15 minutes in seconds
+    maxAge: 15 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",

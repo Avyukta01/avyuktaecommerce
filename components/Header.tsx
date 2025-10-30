@@ -11,13 +11,7 @@ import { signOut, useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { useWishlistStore } from "@/app/_zustand/wishlistStore";
 import apiClient from "@/lib/api";
-<<<<<<< HEAD
 
-// Material UI imports
-import { AppBar, Toolbar, Box, Paper, Container } from "@mui/material";
-
-const Header = () => {
-=======
 import { FaUser } from "react-icons/fa6";
 
 const Header = () => {
@@ -26,7 +20,7 @@ const [showDropdown, setShowDropdown] = useState(false);
 
 
 
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
   const { data: session } = useSession();
   const pathname = usePathname();
   const { wishQuantity, setWishlist } = useWishlistStore();
@@ -37,22 +31,7 @@ const [showDropdown, setShowDropdown] = useState(false);
   const handleClose = () => setAnchorEl(null);
 
 
-<<<<<<< HEAD
-  const getWishlistByUserId = async (id: string) => {
-    const response = await apiClient.get(`/api/wishlist/${id}`, { cache: "no-store" });
-    const wishlist = await response.json();
-    const productArray: {
-      id: string;
-      title: string;
-      price: number;
-      image: string;
-      slug: string
-      stockAvailabillity: number;
-    }[] = [];
 
-    wishlist.map((item: any) => productArray.push({ id: item?.product?.id, title: item?.product?.title, price: item?.product?.price, image: item?.product?.mainImage, slug: item?.product?.slug, stockAvailabillity: item?.product?.inStock }));
-
-=======
   // Fetch wishlist
   const getWishlistByUserId = async (id: string) => {
     const response = await apiClient.get(`/api/wishlist/${id}`, {
@@ -67,18 +46,16 @@ const [showDropdown, setShowDropdown] = useState(false);
       slug: item?.product?.slug,
       stockAvailabillity: item?.product?.inStock,
     }));
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
     setWishlist(productArray);
   };
 
   const getUserByEmail = async () => {
     if (session?.user?.email) {
-<<<<<<< HEAD
-      apiClient.get(`/api/users/email/${session?.user?.email}`, { cache: "no-store" })
-=======
+
       apiClient
         .get(`/api/users/email/${session?.user?.email}`, { cache: "no-store" })
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
         .then((response) => response.json())
         .then((data) => {
           getWishlistByUserId(data?.id);
@@ -91,86 +68,7 @@ const [showDropdown, setShowDropdown] = useState(false);
   }, [session?.user?.email]);
 
   return (
-<<<<<<< HEAD
-    <header suppressHydrationWarning>
-      {/* HeaderTop only for website */}
-      {pathname.startsWith("/admin") === false && <HeaderTop />}
 
-      <AppBar position="static" sx={{ bgcolor: "white", boxShadow: 3, borderBottom: "1px solid #e2e8f0" }}>
-        <Container maxWidth="xl">
-          <Toolbar sx={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", py: 1.5 }}>
-
-            {/* Logo */}
-            <Link href="/">
-              {pathname.startsWith("/admin") ? (
-                <Image src="/logo_new.png" width={130} height={130} alt="singitronic logo" className="w-56 h-auto" />
-              ) : (
-                <Image src="/logo_new.png" width={300} height={300} alt="singitronic logo" className="relative right-5 max-[1023px]:w-56" />
-              )}
-            </Link>
-
-            {/* Website Header */}
-            {pathname.startsWith("/admin") === false && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
-                <Paper
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    px: 1,
-                    py: 0.3,
-                    borderRadius: 3,
-                    minWidth: { xs: "200px", md: "400px" },
-                    boxShadow: 2
-                  }}
-                >
-                  <SearchInput />
-                </Paper>
-
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <NotificationBell sx={{ cursor: "pointer", "&:hover": { color: "#2563eb" } }} />
-                  <HeartElement wishQuantity={wishQuantity} />
-                  <CartElement />
-                </Box>
-              </Box>
-            )}
-
-            {/* Admin Header */}
-            {pathname.startsWith("/admin") && (
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <NotificationBell sx={{ cursor: "pointer", "&:hover": { color: "#2563eb" } }} />
-                <div className="dropdown dropdown-end">
-                  <div tabIndex={0} role="button" className="w-10">
-                    <Image
-                      src="/randomuser.jpg"
-                      alt="random profile photo"
-                      width={30}
-                      height={30}
-                      className="w-full h-full rounded-full"
-                    />
-                  </div>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 text-gray-800"
-                  >
-                    <li>
-                      <Link href="/admin" className="hover:text-blue-600">Dashboard</Link>
-                    </li>
-                    <li>
-                      <a className="hover:text-blue-600">Profile</a>
-                    </li>
-                    <li onClick={handleLogout}>
-                      <a href="#" className="hover:text-red-600">Logout</a>
-                    </li>
-                  </ul>
-
-                </div>
-              </Box>
-            )}
-
-          </Toolbar>
-        </Container>
-      </AppBar>
-=======
     <header className="sticky top-0 z-50 bg-white shadow-sm">
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -269,7 +167,7 @@ const [showDropdown, setShowDropdown] = useState(false);
           </div>
         </div>
       </div>
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
     </header>
   );
 };

@@ -15,14 +15,12 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductItemRating from "./ProductItemRating";
 import { sanitize } from "@/lib/sanitize";
-<<<<<<< HEAD
 
-=======
 import { useProductStore } from "@/app/_zustand/store";
 import { useWishlistStore } from "@/app/_zustand/wishlistStore";
 import { Heart, ShoppingCart, Eye } from "lucide-react";
 import toast from "react-hot-toast";
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
 const ProductItem = ({
   product,
   color,
@@ -30,49 +28,13 @@ const ProductItem = ({
   product: Product;
   color: string;
 }) => {
-<<<<<<< HEAD
-  return (
-    <div className="flex flex-col items-center gap-y-2">
-      <Link href={`/product/${product.slug}`}>
-        <Image
-          src={
-            product.mainImage
-              ? `/${product.mainImage}`
-              : "/product_placeholder.jpg"
-          }
-          width="0"
-          height="0"
-          sizes="100vw"
-          className="w-auto h-[300px]"
-          alt={sanitize(product?.title) || "Product image"}
-        />
-      </Link>
-      <Link
-        href={`/product/${product.slug}`}
-        className={
-          color === "black"
-            ? `text-xl text-black font-normal mt-2 uppercase`
-            : `text-xl text-white font-normal mt-2 uppercase`
-        }
-      >
-        {sanitize(product.title)}
-      </Link>
-      <p
-        className={
-          color === "black"
-            ? "text-lg text-black font-semibold"
-            : "text-lg text-white font-semibold"
-        }
-      >
-        ${product.price}
-      </p>
-=======
+
   const { addToCart } = useProductStore();
   const { addToWishlist, removeFromWishlist, wishlist } = useWishlistStore();
   const [isWishlisted, setIsWishlisted] = useState(
     wishlist.some(item => item.id === product.id)
   );
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();

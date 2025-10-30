@@ -10,92 +10,94 @@
 
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProductItem from "./ProductItem";
 import Heading from "./Heading";
 import apiClient from "@/lib/api";
 
-const ProductsSection = async () => {
-  let products = [];
+const ProductsSection = () => {
+  const [products, setProducts] = useState<any[]>([]);
 
-  try {
-    const data = await apiClient.get("/api/products");
-    if (!data.ok) {
-      console.error("Failed to fetch products:", data.statusText);
-      products = [];
-    } else {
-      const result = await data.json();
-      products = Array.isArray(result) ? result : [];
-    }
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    // Fallback to mock data for testing when database is not connected
-    products = [
-      {
-        id: "1",
-        title: "Smart Phone",
-        price: 29999,
-        rating: 5,
-        description: "Latest smartphone with advanced features",
-        mainImage: "product1.webp",
-        slug: "smart-phone-demo",
-        manufacturer: "Samsung",
-        categoryId: "smart-phones",
-        inStock: 1,
-        category: { name: "Smart Phones" }
-      },
-      {
-        id: "2",
-        title: "Wireless Headphones",
-        price: 15999,
-        rating: 4,
-        description: "High-quality wireless headphones with noise cancellation",
-        mainImage: "product2.webp",
-        slug: "wireless-headphones-demo",
-        manufacturer: "Sony",
-        categoryId: "headphones",
-        inStock: 1,
-        category: { name: "Headphones" }
-      },
-      {
-        id: "3",
-        title: "Smart Watch",
-        price: 24999,
-        rating: 5,
-        description: "Advanced smartwatch with health monitoring",
-        mainImage: "product3.webp",
-        slug: "smart-watch-demo",
-        manufacturer: "Apple",
-        categoryId: "watches",
-        inStock: 0,
-        category: { name: "Watches" }
-      },
-      {
-        id: "4",
-        title: "Gaming Laptop",
-        price: 89999,
-        rating: 4,
-        description: "High-performance gaming laptop with RTX graphics",
-        mainImage: "product4.webp",
-        slug: "gaming-laptop-demo",
-        manufacturer: "ASUS",
-        categoryId: "laptops",
-        inStock: 1,
-        category: { name: "Laptops" }
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const data = await apiClient.get("/api/products");
+        if (!data.ok) {
+          console.error("Failed to fetch products:", data.statusText);
+          setProducts([]);
+        } else {
+          const result = await data.json();
+          setProducts(Array.isArray(result) ? result : []);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        // Fallback mock data
+        setProducts([
+          {
+            id: "1",
+            title: "Smart Phone",
+            price: 29999,
+            rating: 5,
+            description: "Latest smartphone with advanced features",
+            mainImage: "product1.webp",
+            slug: "smart-phone-demo",
+            manufacturer: "Samsung",
+            categoryId: "smart-phones",
+            inStock: 1,
+            category: { name: "Smart Phones" }
+          },
+          {
+            id: "2",
+            title: "Wireless Headphones",
+            price: 15999,
+            rating: 4,
+            description: "High-quality wireless headphones with noise cancellation",
+            mainImage: "product2.webp",
+            slug: "wireless-headphones-demo",
+            manufacturer: "Sony",
+            categoryId: "headphones",
+            inStock: 1,
+            category: { name: "Headphones" }
+          },
+          {
+            id: "3",
+            title: "Smart Watch",
+            price: 24999,
+            rating: 5,
+            description: "Advanced smartwatch with health monitoring",
+            mainImage: "product3.webp",
+            slug: "smart-watch-demo",
+            manufacturer: "Apple",
+            categoryId: "watches",
+            inStock: 0,
+            category: { name: "Watches" }
+          },
+          {
+            id: "4",
+            title: "Gaming Laptop",
+            price: 89999,
+            rating: 4,
+            description: "High-performance gaming laptop with RTX graphics",
+            mainImage: "product4.webp",
+            slug: "gaming-laptop-demo",
+            manufacturer: "ASUS",
+            categoryId: "laptops",
+            inStock: 1,
+            category: { name: "Laptops" }
+          }
+        ]);
       }
-    ];
-  }
+    };
+
+    fetchProducts();
+  }, []); // 👈 runs once only
 
   return (
     <div className="bg-white">
       <div className="max-w-screen-2xl mx-auto py-16 px-5">
         <Heading title="FEATURED PRODUCTS" />
-<<<<<<< HEAD
-        <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
-=======
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mt-10">
->>>>>>> a89075feae2df4122e816472412706b5aad17a94
+        <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
           {products.length > 0 ? (
             products.map((product: any) => (
               <div
