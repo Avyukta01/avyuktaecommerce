@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import NextAuth from "next-auth";
 import type { User as AuthUser } from "next-auth";
+=======
+import NextAuth, { NextAuthOptions } from "next-auth";
+import { Account, User as AuthUser } from "next-auth";
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -7,7 +12,11 @@ import bcrypt from "bcryptjs";
 import prisma from "@/utils/db";
 import { nanoid } from "nanoid";
 
+<<<<<<< HEAD
 export const authOptions = {
+=======
+export const authOptions: NextAuthOptions = {
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
   // Configure one or more authentication providers
   providers: [
     CredentialsProvider({

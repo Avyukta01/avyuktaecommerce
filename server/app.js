@@ -19,7 +19,9 @@ const notificationsRouter = require('./routes/notifications');
 const merchantRouter = require('./routes/merchant'); // Add this line
 const adminRouter = require('./routes/admin');
 const bulkUploadRouter = require('./routes/bulkUpload');
+
 const walletRouter = require('./routes/wallet');
+
 var cors = require("cors");
 
 // Import logging middleware
@@ -101,6 +103,16 @@ const corsOptions = {
   credentials: true, // Allow cookies and authorization headers
 };
 
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
+
 // Apply general rate limiting to all routes
 app.use(generalLimiter);
 
@@ -140,7 +152,9 @@ app.use("/api/notifications", notificationsRouter);
 app.use("/api/merchants", merchantRouter); 
 app.use("/api/bulk-upload", bulkUploadRouter);
 app.use("/api/admin", adminRouter);
+
 app.use("/api/wallet", walletRouter);
+
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {

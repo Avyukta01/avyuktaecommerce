@@ -5,6 +5,7 @@ const prisma = require("../utills/db");
 async function getDashboardStats(request, response) {
   try {
     // Basic aggregates
+
     const [customers, orders, revenueAgg, walletStats, recentTransactions] = await Promise.all([
       prisma.user.count(),
       prisma.customer_order.count(),
@@ -32,6 +33,7 @@ async function getDashboardStats(request, response) {
     const totalWalletBalance = walletStats._sum.balance || 0;
     const activeWallets = walletStats._count.id || 0;
 
+
     // Monthly sales for current year
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -43,6 +45,7 @@ async function getDashboardStats(request, response) {
 
     const monthlySales = Array(12).fill(0);
     for (const o of yearOrders) {
+
       if (o.dateTime) {
         const m = new Date(o.dateTime).getMonth();
         monthlySales[m] += Number(o.total || 0);
@@ -68,6 +71,7 @@ async function getDashboardStats(request, response) {
       _sum: { amount: true }
     });
 
+
     return response.json({
       customers,
       orders,
@@ -78,6 +82,7 @@ async function getDashboardStats(request, response) {
       activeWallets,
       recentTransactions,
       transactionStats
+
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);

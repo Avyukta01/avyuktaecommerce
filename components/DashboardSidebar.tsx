@@ -8,6 +8,8 @@ import { FaBagShopping } from "react-icons/fa6";
 import { FaStore } from "react-icons/fa6";
 import { MdCategory } from "react-icons/md";
 import { FaFileUpload } from "react-icons/fa";
+
+
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -34,6 +36,7 @@ const DashboardSidebar = () => {
   }, []);
 
   return (
+
     <div
       className="xl:w-[260px] max-xl:w-full h-screen fixed top-0 left-0 bg-white shadow-lg border-r border-slate-200 transition-all duration-300 flex flex-col justify-between overflow-y-auto z-50"
     >
@@ -201,6 +204,7 @@ const DashboardSidebar = () => {
           © 2026 Avyukta Admin
         </div>
       </div>
+
     </div>
   );
 };

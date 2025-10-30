@@ -9,6 +9,9 @@
 // *********************
 
 "use client";
+
+import { DashboardSidebar } from "@/components";
+
 import BulkUploadHistory from "@/components/BulkUploadHistory";
 import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
@@ -18,7 +21,9 @@ import {
   FaCheckCircle,
   FaTimesCircle,
 } from "react-icons/fa";
+
 import { Home, CloudUpload } from "@mui/icons-material";
+
 
 interface UploadResult {
   success: boolean;
@@ -151,8 +156,12 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
   };
 
   return (
-    <div className="space-y-6">
-      <div className="w-full">
+  
+    <div className="flex xl:flex-row flex-col justify-start items-start">
+      <DashboardSidebar />
+      <div className="w-full xl:p-14 p-4">
+        <h1 className="text-4xl font-bold mb-8">Bulk Upload Products</h1>
+
 
         {/* Instructions */}
         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
@@ -331,7 +340,10 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                               <li key={index}>{error}</li>
                             ))}
                           </ul>
+
                         </div>    
+
+
                       )}
                   </div>
                 )}

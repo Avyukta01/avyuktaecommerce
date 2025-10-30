@@ -101,10 +101,11 @@ export const navigation = {
     { name: "Partners", href: "#" },
   ],
   help: [
-    { name: "Contact", href: "#" },
-    { name: "How to Buy at Singitronic", href: "#" },
-    { name: "FAQ", href: "#" },
-  ],
+  { name: "Contact Us", href: "/contact" },
+  { name: "How to Buy at", href: "#" },
+  { name: "FAQ", href: "#" },
+],
+
 };
 
 export const isValidNameOrLastname = (input: string) => {

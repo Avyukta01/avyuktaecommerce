@@ -44,11 +44,13 @@ export default function MerchantPage() {
     fetchMerchants();
   }, []);
 
+
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
     setCurrentPage(1);
   }, []);
+
 
   const filteredMerchants = useMemo(() => {
     if (!merchants) return [];

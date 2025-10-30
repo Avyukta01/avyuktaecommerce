@@ -1,10 +1,18 @@
 "use client";
+
 import { CustomButton } from "@/components";
+
 import apiClient from "@/lib/api";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Home, People } from "@mui/icons-material";
+
+interface User {
+  id: number;
+  email: string;
+  role: string;
+}
 
 interface User {
   id: number;

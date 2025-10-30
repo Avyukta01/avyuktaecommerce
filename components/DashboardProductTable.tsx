@@ -27,8 +27,10 @@ const DashboardProductTable = () => {
   /* -------------------------- DATA FETCHING ------------------------- */
   /* ------------------------------------------------------------------ */
   useEffect(() => {
+
     apiClient
       .get("/api/products?mode=admin", { cache: "no-store" })
+
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch products");
         return res.json();
@@ -244,6 +246,7 @@ const DashboardProductTable = () => {
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900">{sanitize(product.title)}</span>
                         <span className="text-xs text-gray-500">{sanitize(product.manufacturer)}</span>
+
                       </div>
                     </div>
                   </td>

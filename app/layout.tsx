@@ -9,7 +9,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Providers from "@/Providers";
 import SessionTimeoutWrapper from "@/components/SessionTimeoutWrapper";
+<<<<<<< HEAD
 import ConditionalLayout from "@/components/ConditionalLayout";
+=======
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +29,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+<<<<<<< HEAD
   const session = await getServerSession(authOptions);
+=======
+  const session = await getServerSession();
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
   return (
     <html lang="en" data-theme="light">
       <body className={inter.className}>

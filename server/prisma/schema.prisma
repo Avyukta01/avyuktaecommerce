@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+<<<<<<< HEAD
 model customer_order_product {
   id              String         @id @default(uuid())
   customerOrderId String
@@ -17,6 +18,7 @@ model customer_order_product {
 
   @@index([customerOrderId], map: "customer_order_product_customerOrderId_fkey")
   @@index([productId], map: "customer_order_product_productId_fkey")
+
 }
 
 model category {
@@ -25,7 +27,20 @@ model category {
   product product[]
 }
 
+<<<<<<< HEAD
 model customer_order {
+=======
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String?
+  role          String?        @default("user")
+  Wishlist      Wishlist[]
+  notifications Notification[]
+}
+
+model Customer_order {
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
   id          String                   @id @default(uuid())
   name        String
   lastname    String
@@ -66,6 +81,7 @@ model merchant {
 model notification {
   id        String                @id
   userId    String
+<<<<<<< HEAD
   title     String
   message   String                @db.Text
   type      notification_type
@@ -75,6 +91,9 @@ model notification {
   createdAt DateTime              @default(now())
   updatedAt DateTime
   user      user                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "Notification_userId_fkey")
+=======
+}
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94
 
   @@index([createdAt], map: "Notification_createdAt_idx")
   @@index([userId], map: "Notification_userId_idx")
@@ -178,6 +197,7 @@ enum transaction_type {
   PAYMENT
   TRANSFER
 }
+<<<<<<< HEAD
 
 enum transaction_status {
   PENDING
@@ -187,3 +207,5 @@ enum transaction_status {
 }
 
 
+=======
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94

@@ -9,6 +9,7 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
+
 import CustomButton from "@/components/CustomButton";
 import apiClient from "@/lib/api";
 import '../components/styles/buttonstyle.css';
@@ -22,6 +23,7 @@ interface Order {
   dateTime: string;
 }
 
+
 const AdminOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,7 +32,8 @@ const AdminOrders = () => {
   const [error, setError] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState("id");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const itemsPerPage = 5;
+ const [itemsPerPage, setItemsPerPage] = useState<number>(5);
+
 
   const fetchOrders = async () => {
     try {
@@ -48,6 +51,7 @@ const AdminOrders = () => {
   };
 
   useEffect(() => {
+
     fetchOrders();
   }, []);
 
@@ -246,6 +250,8 @@ const AdminOrders = () => {
               <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
+
+
 
           <tbody className="bg-white divide-y divide-gray-200">
             {isLoading ? (

@@ -1,36 +1,127 @@
-// *********************
-// Role of the component: IntroducingSection with the text "Introducing Singitronic"
-// Name of the component: IntroducingSection.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <IntroducingSection />
-// Input parameters: no input parameters
-// Output: Section with the text "Introducing Singitronic" and button
-// *********************
+"use client";
 
-import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { Heart, ShoppingCart } from "lucide-react";
+import apiClient from "@/lib/api"; // Your axios/fetch wrapper
 
-const IntroducingSection = () => {
+// -----------------------------
+// Type Definitions
+// -----------------------------
+interface Product {
+  id: number | string;
+  title: string;
+  price: number;
+  mainImage?: string;
+  [key: string]: any; // extra fields from API
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
+
+// -----------------------------
+// Component
+// -----------------------------
+const IntroducingSection: React.FC = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Fetch products dynamically from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await apiClient.get("/api/products");
+        if (response.ok) {
+          const data = await response.json();
+          setProducts(Array.isArray(data) ? data : []);
+        } else {
+          console.error("Failed to fetch products:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Add product to cart
+  const handleAddToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existing = prevCart.find((item) => item.id === product.id);
+      if (existing) {
+        return prevCart.map((item) =>
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+        );
+      }
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
+
   return (
-    <div className="py-20 pt-24 bg-gradient-to-l from-white to-blue-600">
-      <div className="text-center flex flex-col gap-y-5 items-center">
-        <h2 className="text-white text-8xl font-extrabold text-center mb-2 max-md:text-6xl max-[480px]:text-4xl">
-          INTRODUCING <span className="text-black">SINGI</span><span className="text-blue-600">TRONIC</span>
+    <section className="py-20 bg-white relative">
+      {/* Section Header */}
+      <div className="text-center mb-12">
+        <h2 className="text-5xl font-extrabold text-black-700 max-md:text-4xl max-sm:text-3xl">
+          Popular Products
         </h2>
-        <div>
-          <p className="text-white text-center text-2xl font-semibold max-md:text-xl max-[480px]:text-base">
-            Buy the latest electronics.
-          </p>
-          <p className="text-white text-center text-2xl font-semibold max-md:text-xl max-[480px]:text-base">
-            The best electronics for tech lovers.
-          </p>
-          <Link href="/shop" className="block text-blue-600 bg-white font-bold px-12 py-3 text-xl hover:bg-gray-100 w-96 mt-2  max-md:text-lg max-md:w-72 max-[480px]:w-60 mx-auto">
-            SHOP NOW
-          </Link>
-        </div>
+        <p className="text-gray-500 text-lg mt-3 max-sm:text-base">
+          Discover our latest arrivals — crafted for your lifestyle.
+        </p>
       </div>
-    </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 max-w-7xl mx-auto px-4 sm:px-6">
+        {products.length > 0 ? (
+          products.map((product) => (
+            <div
+              key={product.id}
+              className="group bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+            >
+              {/* Image */}
+              <div className="relative w-full h-40 sm:h-44 flex items-center justify-center overflow-hidden bg-gray-50">
+                <Image
+                  src={product.mainImage || "/placeholder.png"}
+                  alt={product.title}
+                  width={160}
+                  height={160}
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
+
+              {/* Product Info */}
+              <div className="p-3">
+                <h3 className="text-sm font-medium text-gray-900 line-clamp-2 mb-2">
+                  {product.title}
+                </h3>
+                <p className="text-blue-600 text-lg font-bold mb-3">
+                  ₹{product.price}
+                </p>
+
+                {/* Buttons */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleAddToCart(product)}
+                    className="flex-1 flex items-center justify-center gap-1 bg-blue-600 text-white px-3 py-2 rounded-md text-xs font-medium hover:bg-blue-700 transition-colors duration-200"
+                  >
+                    <ShoppingCart size={14} />
+                    <span className="hidden sm:inline">Add</span>
+                  </button>
+                  <button className="p-2 rounded-md border border-gray-300 hover:bg-pink-50 transition-colors duration-200">
+                    <Heart size={16} className="text-pink-500" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-full text-center text-gray-700 py-20 text-lg font-semibold">
+            Loading products...
+          </div>
+        )}
+      </div>
+    </section>
   );
 };
 

@@ -67,8 +67,9 @@ export default function NewMerchantPage() {
  return (
   <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
     <DashboardSidebar />
-    
+
     <div className="xl: w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+
       {/* Professional Card - INCREASED SIZE */}
       <div >
         <h1 className="text-2xl font-bold text-gray-900 mb-2 text-center">

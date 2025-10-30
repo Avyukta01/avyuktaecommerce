@@ -11,6 +11,7 @@ const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 type MonthlySalesChartProps = {
   data?: number[]; // length 12
+
   period?: string;
 };
 
@@ -121,6 +122,7 @@ const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data, period = 'M
         <span className="text-sm font-medium text-slate-500">
           {period === 'Year' ? '2020-2025 Overview' : period === 'Day' ? 'Weekly Overview' : '2025 Overview'}
         </span>
+
       </div>
       <ApexChart options={options} series={series} type="bar" height={280} />
     </div>
@@ -128,3 +130,5 @@ const MonthlySalesChart: React.FC<MonthlySalesChartProps> = ({ data, period = 'M
 };
 
 export default MonthlySalesChart;
+
+

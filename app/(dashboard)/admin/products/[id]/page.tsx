@@ -139,7 +139,9 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   }, [id]);
 
   return (
+
     <div className="xl: w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+
       <DashboardSidebar />
       <div className="pb-6 pt-4 border-b-2 border-gray-200 mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">Product details</h1>

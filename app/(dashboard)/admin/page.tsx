@@ -1,5 +1,7 @@
 
 "use client";
+
+
 import React, { useEffect, useState } from "react";
 import DashboardCard from "@/components/DashboardCard";
 import MonthlySalesChart from "@/components/MonthlySalesChart";
@@ -7,6 +9,7 @@ import TargetGauge from "@/components/TargetGauge";
 import { FaUserFriends } from "react-icons/fa";
 import { FaBox } from "react-icons/fa6";
 import { MdAttachMoney } from "react-icons/md";
+
 import { FaWallet } from "react-icons/fa";
 import apiClient from "@/lib/api";
 
@@ -38,6 +41,7 @@ const AdminDashboardPage = () => {
   } | null>(null);
   const [analyticsPeriod, setAnalyticsPeriod] = useState('Month');
 
+
   useEffect(() => {
     const load = async () => {
       try {
@@ -54,6 +58,7 @@ const AdminDashboardPage = () => {
     };
     load();
   }, []);
+
 return (
   <div className="space-y-6">
 

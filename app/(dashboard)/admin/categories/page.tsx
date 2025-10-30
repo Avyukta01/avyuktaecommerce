@@ -5,7 +5,9 @@ import Link from "next/link";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { formatCategoryName } from "../../../../utils/categoryFormating";
 import apiClient from "@/lib/api";
+
 import { Home, Category } from "@mui/icons-material";
+
 
 interface Category {
   id: number;
@@ -17,12 +19,16 @@ const DashboardCategory = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const itemsPerPage = 5;
+ const [itemsPerPage, setItemsPerPage] = useState<number>(5);
 
-  // getting all categories to be displayed on the all categories page
+  
   useEffect(() => {
+
     apiClient
       .get("/api/categories")
+
+    apiClient.get("/api/categories")
+
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch categories");

@@ -47,7 +47,9 @@ model User {
   role          String?        @default("user")
   Wishlist      Wishlist[]
   notifications Notification[]
+<<<<<<< HEAD
   wallet        Wallet?
+
   // Back relation for bulk upload batches
   bulkUploadBatches bulk_upload_batch[] @relation("UserBatches")
 }
@@ -191,6 +193,7 @@ enum BulkUploadItemStatus {
   UPDATED
   ERROR
 }
+<<<<<<< HEAD
 
 model Wallet {
   id          String   @id @default(uuid())
@@ -238,3 +241,5 @@ model WalletTransaction {
   @@index([status])
   @@index([createdAt])
 }
+=======
+>>>>>>> a89075feae2df4122e816472412706b5aad17a94

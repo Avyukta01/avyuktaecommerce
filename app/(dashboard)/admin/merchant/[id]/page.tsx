@@ -307,6 +307,7 @@ const handleInputChange = (
         </div>
       </div>
 
+
       {/* === PRODUCTS CARD === */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Card Header */}
@@ -326,6 +327,7 @@ const handleInputChange = (
                     <th className="px-6 py-3">Price</th>
                     <th className="px-6 py-3">In Stock</th>
                     <th className="px-6 py-3">Actions</th>
+
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

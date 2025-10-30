@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ import { FaPlus, FaUpload, FaSave, FaArrowLeft, FaImage, FaTag, FaStore, FaBox, 
 
 interface Product {
   merchantId: string;
+
     title: string;
     price: number;
     manufacturer: string;
@@ -37,6 +39,7 @@ const AddNewProduct = () => {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [product, setProduct] = useState<Product>({
+
     merchantId: "",
     title: "",
     price: 0,
@@ -49,6 +52,7 @@ const AddNewProduct = () => {
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
+
   const [imagePreview, setImagePreview] = useState<string>("");
 
   const addProduct = async () => {
@@ -58,13 +62,16 @@ const AddNewProduct = () => {
     }
 
     setLoading(true);
+
     try {
       const sanitizedProduct = sanitizeFormData(product);
       const response = await apiClient.post(`/api/products`, sanitizedProduct);
 
       if (response.status === 201) {
+
         toast.success("Product added successfully!");
         router.push("/admin/products");
+
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to add product");
@@ -98,7 +105,9 @@ const AddNewProduct = () => {
     formData.append("uploadedFile", file);
 
     try {
+
       const response = await apiClient.post("/api/main-image", formData);
+
 
       if (!response.ok) {
         toast.error("File upload failed");
@@ -117,6 +126,7 @@ const AddNewProduct = () => {
   };
 
   const fetchCategories = async () => {
+
     try {
       const res = await apiClient.get(`/api/categories`);
       const data: Category[] = await res.json();
@@ -139,6 +149,7 @@ const AddNewProduct = () => {
       reader.readAsDataURL(file);
       uploadFile(file);
     }
+
   };
 
   useEffect(() => {
@@ -170,8 +181,10 @@ const AddNewProduct = () => {
                   
                   {/* Product Name */}
         <div>
+
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Product Name *
+
           </label>
                     <input
                       type="text"
@@ -184,9 +197,11 @@ const AddNewProduct = () => {
 
                   {/* Product Slug */}
         <div>
+
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Product Slug *
                     </label>
+
             <input
               type="text"
                       value={convertSlugToURLFriendly(product.slug)}
