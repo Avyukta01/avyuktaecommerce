@@ -5,11 +5,16 @@ import { nanoid } from "nanoid";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
+interface User {
+  id: number;
+  email: string;
+  role: string;
+}
+
 const DashboardUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    // sending API request for all users
     apiClient.get("/api/users")
       .then((res) => {
         return res.json();

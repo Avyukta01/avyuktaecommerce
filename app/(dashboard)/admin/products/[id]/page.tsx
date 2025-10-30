@@ -139,13 +139,14 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   }, [id]);
 
   return (
-    <div className="bg-white flex justify-start max-w-screen-2xl mx-auto xl:h-full max-xl:flex-col max-xl:gap-y-5">
+    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
       <DashboardSidebar />
-      <div className="flex flex-col gap-y-7 xl:ml-5 w-full max-xl:px-5">
-        <h1 className="text-3xl font-semibold">Product details</h1>
+      <div className="pb-6 pt-4 border-b-2 border-gray-200 mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Product details</h1>
         {/* Product name input div - start */}
-        
-        <div>
+        </div>
+        <div className="flex justify-start items-center gap-x-10 max-sm:flex-col">
+<div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Product name:</span>
@@ -160,10 +161,7 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             />
           </label>
         </div>
-        {/* Product name input div - end */}
-        {/* Product price input div - start */}
-
-        <div>
+<div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Product price:</span>
@@ -178,8 +176,6 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             />
           </label>
         </div>
-        {/* Product price input div - end */}
-        {/* Product manufacturer input div - start */}
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
@@ -195,9 +191,6 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             />
           </label>
         </div>
-        {/* Product manufacturer input div - end */}
-        {/* Product slug input div - start */}
-
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
@@ -218,16 +211,18 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             />
           </label>
         </div>
-        {/* Product slug input div - end */}
-        {/* Product inStock select input div - start */}
+        </div>
+        
 
+        <div className="flex justify-start items-center gap-x-10 max-sm:flex-col">
+          
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Is product in stock?</span>
             </div>
             <select
-              className="select select-bordered"
+              className="select select-bordered w-64"
               value={product?.inStock ?? 1}
               onChange={(e) => {
                 setProduct({ ...product!, inStock: Number(e.target.value) });
@@ -238,15 +233,14 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             </select>
           </label>
         </div>
-        {/* Product inStock select input div - end */}
-        {/* Product category select input div - start */}
+
         <div>
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Category:</span>
             </div>
             <select
-              className="select select-bordered"
+              className="select select-bordered w-64"
               value={product?.categoryId || ""}
               onChange={(e) =>
                 setProduct({
@@ -264,51 +258,50 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             </select>
           </label>
         </div>
-        {/* Product category select input div - end */}
 
-        {/* Main image file upload div - start */}
-        <div>
-          <input
-            type="file"
-            className="file-input file-input-bordered file-input-lg w-full max-w-sm"
-            onChange={(e) => {
-              // @ts-ignore
-              const selectedFile = e.target.files[0];
+       <div className="flex items-center gap-6">
+  {/* Left: File Input + (optional) selected file name */}
+  <div className="flex-1 max-w-xs mt-5">
+    <input
+      type="file"
+      className="file-input file-input-bordered file-input-sm w-full"
+      onChange={(e) => {
+        // @ts-ignore
+        const selectedFile = e.target.files[0];
 
-              if (selectedFile) {
-                uploadFile(selectedFile);
-                setProduct({ ...product!, mainImage: selectedFile.name });
-              }
-            }}
-          />
-          {product?.mainImage && (
-            <Image
-              src={`/` + product?.mainImage}
-              alt={product?.title}
-              className="w-auto h-auto mt-2"
-              width={100}
-              height={100}
-            />
-          )}
+        if (selectedFile) {
+          uploadFile(selectedFile);
+          setProduct({ ...product!, mainImage: selectedFile.name });
+        }
+      }}
+    />
+    {product?.mainImage && (
+      <p className="text-xs text-gray-600 mt-1 truncate">
+        {product.mainImage}
+      </p>
+    )}
+  </div>
+
+  {/* Right: Small rounded image preview – vertically centered */}
+  {product?.mainImage && (
+    <div className="flex-shrink-0 mt-3">
+      <Image
+        src={`/${product.mainImage}`}
+        alt={product?.title || "Product image"}
+        width={80}
+        height={80}
+        className="w-20 h-20 object-cover rounded-lg shadow-sm border border-gray-200"
+      />
+    </div>
+  )}
+</div>
+
         </div>
-        {/* Main image file upload div - end */}
-        {/* Other images file upload div - start */}
-        <div className="flex gap-x-1">
-          {otherImages &&
-            otherImages.map((image) => (
-              <Image
-                src={`/${image.image}`}
-                key={nanoid()}
-                alt="product image"
-                width={100}
-                height={100}
-                className="w-auto h-auto"
-              />
-            ))}
-        </div>
-        {/* Other images file upload div - end */}
-        {/* Product description div - start */}
-        <div>
+      
+        
+        <div className="flex justify-start items-center gap-x-10 max-sm:flex-col">
+          <div className="w-full lg:w-1/2">
+          <div>
           <label className="form-control">
             <div className="label">
               <span className="label-text">Product description:</span>
@@ -322,31 +315,38 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
             ></textarea>
           </label>
         </div>
+          </div>
+        </div>
+        
         {/* Product description div - end */}
         {/* Action buttons div - start */}
-        <div className="flex gap-x-2 max-sm:flex-col">
-          <button
-            type="button"
-            onClick={updateProduct}
-            className="uppercase bg-blue-500 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2"
-          >
-            Update product
-          </button>
-          <button
-            type="button"
-            className="uppercase bg-red-600 px-10 py-5 text-lg border border-black border-gray-300 font-bold text-white shadow-sm hover:bg-red-700 hover:text-white focus:outline-none focus:ring-2"
-            onClick={deleteProduct}
-          >
-            Delete product
-          </button>
+        <div className="flex justify-end items-center gap-x-10 max-sm:flex-col">
+         
+          
+    <div className="flex justify-center items-center gap-x-4 max-sm:flex-col mt-5">
+  <button
+    type="button"
+    className="uppercase bg-blue-500 w-auto inline-flex justify-center items-center px-5 py-2 text-sm font-semibold text-white border border-gray-300 rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-400 transition-all"
+    onClick={updateProduct}
+  >
+    Update product
+  </button>
+
+  <button
+    type="button"
+    className="uppercase bg-red-600 w-auto inline-flex justify-center items-center px-5 py-2 text-sm font-semibold text-white border border-gray-300 rounded-md shadow-sm hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-400 transition-all"
+    onClick={deleteProduct}
+  >
+    Delete product
+  </button>
+</div>
+
+
         </div>
-        {/* Action buttons div - end */}
-        <p className="text-xl max-sm:text-lg text-error">
-          To delete the product you first need to delete all its records in
-          orders (customer_order_product table).
-        </p>
+        
+      
       </div>
-    </div>
+    
   );
 };
 

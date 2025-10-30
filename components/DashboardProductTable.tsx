@@ -17,9 +17,21 @@ import CustomButton from "./CustomButton";
 import apiClient from "@/lib/api";
 import { sanitize } from "@/lib/sanitize";
 
+interface Product {
+  id: number;
+  title: string;
+  manufacturer: string;
+  inStock: boolean;
+  price: number;
+  mainImage?: string;
+}
+
 const DashboardProductTable = () => {
   const [products, setProducts] = useState<Product[]>([]);
 
+  /* ------------------------------------------------------------------ */
+  /* -------------------------- DATA FETCHING ------------------------- */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
     apiClient.get("/api/products?mode=admin", {cache: "no-store"})
       .then((res) => {
