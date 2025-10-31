@@ -18,7 +18,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   loading = false
 }) => {
   return (
-    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+    <div className="xl: w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
     
         <div className="max-w-7xl mx-auto">
           

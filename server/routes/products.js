@@ -1,5 +1,5 @@
+// routes/products.js
 const express = require("express");
-
 const router = express.Router();
 const {
   getAllProducts,
@@ -8,15 +8,24 @@ const {
   deleteProduct,
   searchProducts,
   getProductById,
+  upload,
 } = require("../controllers/products");
 
-router.route("/").get(getAllProducts).post(createProduct);
+// -------------------------------------------------
+//  ROOT  →  GET list  /  POST create (multipart)
+// -------------------------------------------------
+router
+  .route("/")
+  .get(getAllProducts)
+  .post(upload.any(), createProduct);   // ← FIXED: .any() instead of .array()
 
-
+// -------------------------------------------------
+//  /:id  →  GET one  /  PUT update (multipart)  /  DELETE
+// -------------------------------------------------
 router
   .route("/:id")
   .get(getProductById)
-  .put(updateProduct)
+  .put(upload.any(), updateProduct)     // ← FIXED: .any() instead of .array()
   .delete(deleteProduct);
 
 module.exports = router;
