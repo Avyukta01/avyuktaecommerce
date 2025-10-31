@@ -1,73 +1,236 @@
 "use client";
 import Image from "next/image";
 import React from "react";
+import bgImage from "@/public/custom/backgrounglandingpage.png";
 
 const Hero = () => {
   return (
-    <section className="relative w-full bg-[#F8FAFC] overflow-hidden py-20 px-6 sm:px-10">
-      {/* Background subtle glows */}
-      <div className="absolute top-20 left-10 w-64 h-64 bg-gray-200 blur-[120px] rounded-full opacity-40"></div>
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-gray-300 blur-[120px] rounded-full opacity-40"></div>
+    <section
+      style={{
+        position: "relative",
+        width: "100%",
+        minHeight: "100vh",
+        overflow: "hidden",
+        padding: "80px 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* Background Image */}
+      <Image
+        src={bgImage}
+        alt="Ecommerce Background"
+        fill
+        priority
+        style={{
+          objectFit: "cover",
+          objectPosition: "center",
+          position: "absolute",
+          inset: 0,
+          zIndex: -10,
+          opacity: 0.9,
+          animation: "fadeIn 3s ease-in-out",
+        }}
+      />
 
-      {/* Main Container */}
-      <div className="relative max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-12 z-10">
-        {/* Left: Text Section */}
-        <div className="flex flex-col gap-6 text-left max-lg:text-center">
-          <h1 className="text-5xl sm:text-6xl font-extrabold text-gray-900 leading-tight">
+      {/* Gradient Overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(230,245,255,0.4))",
+          zIndex: -9,
+        }}
+      ></div>
+
+      {/* Glowing Blobs */}
+      <div
+        style={{
+          position: "absolute",
+          top: "15%",
+          left: "10%",
+          width: "250px",
+          height: "250px",
+          background: "rgba(180,220,255,0.4)",
+          borderRadius: "50%",
+          filter: "blur(120px)",
+          animation: "blobMove 8s infinite alternate ease-in-out",
+        }}
+      ></div>
+
+      <div
+        style={{
+          position: "absolute",
+          bottom: "10%",
+          right: "10%",
+          width: "300px",
+          height: "300px",
+          background: "rgba(200,220,255,0.5)",
+          borderRadius: "50%",
+          filter: "blur(120px)",
+          animation: "blobMove2 10s infinite alternate ease-in-out",
+        }}
+      ></div>
+
+      {/* Main Content */}
+      <div
+        style={{
+          position: "relative",
+          zIndex: 10,
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          maxWidth: "1200px",
+          width: "100%",
+          flexWrap: "wrap",
+          gap: "40px",
+        }}
+      >
+        {/* Left Content */}
+        <div
+          style={{
+            flex: "1 1 500px",
+            color: "#111",
+            animation: "slideInLeft 1.5s ease",
+            textAlign: "left",
+          }}
+        >
+          <h1
+            style={{
+              fontSize: "clamp(2.5rem, 5vw, 4rem)",
+              fontWeight: "900",
+              lineHeight: "1.2",
+              marginBottom: "20px",
+            }}
+          >
             Smart Choices, Better Living
           </h1>
 
-          <p className="text-gray-600 text-lg sm:text-base leading-relaxed  mx-auto max-lg:mx-auto">
+          <p
+            style={{
+              fontSize: "clamp(1rem, 2vw, 1.25rem)",
+              color: "#333",
+              lineHeight: "1.6",
+              maxWidth: "600px",
+              marginBottom: "30px",
+            }}
+          >
             Discover trending products curated just for you. Shop smarter and enjoy exclusive deals
             on electronics, lifestyle, and fashion — all in one place.
           </p>
 
-          {/* Dynamic product info placeholder */}
-          <div className="bg-white rounded-2xl shadow-md p-6 mt-2 w-full sm:w-[100%] mx-auto border border-gray-100" >
-            <div className="flex items-center justify-between gap-6 max-sm:flex-col" >
-              {/* Image placeholder */}
-              <div className="w-[120px] h-[120px] bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-sm font-medium">
-                Image
-              </div>
+          <div
+  style={{
+    display: "flex",
+    gap: "20px",
+    flexWrap: "wrap",
+  }}
+>
+  <button
+    style={{
+      backgroundColor: "#111",
+      color: "#fff",
+      fontWeight: "600",
+      padding: "14px 40px",
+      borderRadius: "12px",
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+    }}
+    onMouseEnter={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#333";
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#111";
+    }}
+  >
+    Shop Now
+  </button>
 
-              {/* Product info placeholder */}
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                  Product Name
-                </h3>
-                <p className="text-gray-500 mb-3 text-sm">
-                  Short product description goes here.
-                </p>
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl font-bold text-red-500">$699</span>
-                  <span className="text-gray-400 line-through">$999</span>
-                </div>
-              </div>
-            </div>
-          </div>
+  <button
+    style={{
+      backgroundColor: "transparent",
+      color: "#111",
+      fontWeight: "600",
+      padding: "14px 40px",
+      borderRadius: "12px",
+      border: "2px solid #111",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+    }}
+    onMouseEnter={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#f3f3f3";
+    }}
+    onMouseLeave={(e) => {
+      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
+    }}
+  >
+    View Offers
+  </button>
+</div>
 
-          {/* Buttons */}
-          <div className="flex gap-4 mt-6 max-lg:justify-center max-sm:flex-col">
-            <button className="bg-gray-900 text-white font-semibold px-10 py-3 rounded-xl shadow-md hover:bg-gray-800 transition-all duration-300">
-              Shop Now
-            </button>
-            <button className="border border-gray-900 text-gray-900 font-semibold px-10 py-3 rounded-xl hover:bg-gray-100 transition-all duration-300">
-              View Offers
-            </button>
-          </div>
-        </div>
-
-        {/* Right: Image Section */}
-        <div className="flex justify-center relative" style={{marginBottom:"100px"}}>
-          {/* Soft glow behind product */}
-          <div className="absolute w-[350px] h-[350px] bg-gray-200 rounded-full blur-3xl animate-pulse"></div>
-
-          {/* Dynamic image placeholder */}
-          <div className="relative z-10 w-[400px] h-[400px] bg-white border border-gray-100 rounded-2xl shadow-lg flex items-center justify-center text-gray-400 font-medium max-md:w-[300px] max-md:h-[300px]">
-            Product Image
-          </div>
         </div>
       </div>
+
+      {/* Inline Animations */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: scale(1.05);
+          }
+          to {
+            opacity: 0.9;
+            transform: scale(1);
+          }
+        }
+
+        @keyframes blobMove {
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(60px, -40px);
+          }
+        }
+
+        @keyframes blobMove2 {
+          0% {
+            transform: translate(0, 0);
+          }
+          100% {
+            transform: translate(-40px, 50px);
+          }
+        }
+
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-60px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @media (max-width: 768px) {
+          section {
+            padding: 60px 16px;
+          }
+          div {
+            text-align: center !important;
+          }
+          button {
+            width: 100%;
+          }
+        }
+      `}</style>
     </section>
   );
 };

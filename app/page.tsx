@@ -5,10 +5,11 @@ export default function Home() {
   return (
     <>
     <Hero />
+     <CategoryMenu />
      <ProductsSection />
    
-    <CategoryMenu />
-    <IntroducingSection />
+   
+    {/* <IntroducingSection /> */}
     <PromoBanner/>
     </>
   );

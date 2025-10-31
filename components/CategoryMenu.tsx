@@ -35,23 +35,24 @@ const CategoryMenu = () => {
         >
           {categoryMenuList.map((item) => (
             <SwiperSlide key={item.id}>
-              <div className="group flex flex-col items-center bg-white rounded-2xl shadow-md p-4 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                {/* Image Container */}
-                <div className="w-24 h-24 rounded-full bg-gradient-to-r from-blue-100 to-blue-50 flex items-center justify-center mb-3 border border-blue-200">
-                  <Image
-                    src={item.src}
-                    width={56}
-                    height={56}
-                    alt={item.title}
-                    className="object-contain transition-transform duration-300 group-hover:scale-110"
-                  />
-                </div>
-                {/* Category Title */}
-                <h3 className="text-center text-black font-semibold text-sm md:text-base">
-                  {item.title}
-                </h3>
-              </div>
-            </SwiperSlide>
+  <div className="group flex flex-col items-center bg-white/80 backdrop-blur-md border border-gray-100 rounded-2xl shadow-sm hover:shadow-lg p-6 transition-all duration-500 hover:-translate-y-3 hover:bg-gradient-to-br hover:from-blue-50 hover:to-indigo-50">
+    {/* Image Container */}
+    <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-blue-100 via-indigo-50 to-blue-50 flex items-center justify-center mb-4 shadow-inner border border-blue-200 group-hover:scale-105 transition-transform duration-300">
+      <Image
+        src={item.src}
+        width={60}
+        height={60}
+        alt={item.title}
+        className="object-contain transition-transform duration-300 group-hover:scale-110"
+      />
+    </div>
+    {/* Category Title */}
+    <h3 className="text-center text-gray-900 font-semibold text-base md:text-lg tracking-wide group-hover:text-blue-700 transition-colors duration-300">
+      {item.title}
+    </h3>
+  </div>
+</SwiperSlide>
+
           ))}
         </Swiper>
       </div>

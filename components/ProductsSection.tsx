@@ -84,6 +84,32 @@ const ProductsSection = () => {
             categoryId: "laptops",
             inStock: 1,
             category: { name: "Laptops" }
+          },
+          {
+            id: "5",
+            title: "Gaming Laptop",
+            price: 89999,
+            rating: 4,
+            description: "High-performance gaming laptop with RTX graphics",
+            mainImage: "product4.webp",
+            slug: "gaming-laptop-demo",
+            manufacturer: "ASUS",
+            categoryId: "laptops",
+            inStock: 1,
+            category: { name: "Laptops" }
+          },
+          {
+            id: "6",
+            title: "Gaming Laptop",
+            price: 89999,
+            rating: 4,
+            description: "High-performance gaming laptop with RTX graphics",
+            mainImage: "product4.webp",
+            slug: "gaming-laptop-demo",
+            manufacturer: "ASUS",
+            categoryId: "laptops",
+            inStock: 1,
+            category: { name: "Laptops" }
           }
         ]);
       }
@@ -95,9 +121,9 @@ const ProductsSection = () => {
   return (
     <div className="bg-white">
       <div className="max-w-screen-2xl mx-auto py-16 px-5">
-        <Heading title="FEATURED PRODUCTS" />
+        <Heading title=" Products" />
 
-        <div className="grid grid-cols-4 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-2 px-10 gap-y-8 max-xl:grid-cols-3 max-md:grid-cols-2 max-sm:grid-cols-1">
+<div className="grid grid-cols-5 justify-items-center max-w-screen-2xl mx-auto py-10 gap-x-1 gap-y-4 px-2 max-md:grid-cols-2">
           {products.length > 0 ? (
             products.map((product: any) => (
               <div
