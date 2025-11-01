@@ -3,9 +3,9 @@ import React from "react";
 import Image from "next/image";
 
 // ✅ Import images directly (instead of string paths)
-import promo1 from "@/public/smart phone 3.png";
-import promo2 from "@/public/camera 3.png";
-import promo3 from "@/public/camera 2.png";
+import promo1 from "@/public/1761850281533-164197404.jpeg";
+import promo2 from "@/public/custom/backgrounddarkhero.png";
+import promo3 from "@/public/1761888897326-653269807.webp";
 
 interface Banner {
   title: string;

@@ -50,7 +50,7 @@ const Filters = () => {
   }, [inputCategory, sortBy, page]);
 
   return (
-    <div>
+<div className="w-60 h-screen sticky top-20 overflow-y-auto bg-white shadow-md p-3  rounded-lg">
       <h3 className="text-2xl mb-2">Filters</h3>
       <div className="divider"></div>
       <div className="flex flex-col gap-y-1">

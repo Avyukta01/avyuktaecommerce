@@ -6,7 +6,7 @@ export default function Home() {
     <>
     <Hero />
      <CategoryMenu />
-     <ProductsSection />
+     <ProductsSection/>
    
    
     {/* <IntroducingSection /> */}

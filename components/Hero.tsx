@@ -2,8 +2,12 @@
 import Image from "next/image";
 import React from "react";
 import bgImage from "@/public/custom/backgrounglandingpage.png";
+import { useRouter } from "next/navigation"; // ✅ add this at the top
 
 const Hero = () => {
+
+  const router = useRouter(); // ✅ add this inside your component before return()
+
   return (
     <section
       style={{
@@ -148,7 +152,9 @@ const Hero = () => {
     onMouseLeave={(e) => {
       (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#111";
     }}
-  >
+    onClick={() => router.push("/shop")} 
+   
+   >
     Shop Now
   </button>
 
