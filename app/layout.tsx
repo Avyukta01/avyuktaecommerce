@@ -17,9 +17,7 @@ export const metadata: Metadata = {
   title: "Avyukta Ecommerce",
   description:
     "Avyukta E-commerce is your all-in-one online shopping destination offering premium-quality products at unbeatable prices.",
-  icons: {
-    icon: "/favicon.png",
-  },
+  
 };
 
 export default async function RootLayout({

@@ -2,24 +2,22 @@ const prisma = require("../utills/db");
 const { asyncHandler, handleServerError, AppError } = require("../utills/errorHandler");
 
 // ✅ Multer Setup
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
-// ✅ Directly save in "public" (root level)
-const uploadDir = path.join(__dirname, '..', '..', 'public');
-
-// 🧱 Ensure "public" exists
+// ✅ Save uploads directly in public folder
+const uploadDir = path.join(__dirname, "..", "..", "public");
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
 // ⚙️ Multer Storage Config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir); // ✅ Save directly in public
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const name = `${Date.now()}-${Math.round(Math.random() * 1E9)}${ext}`;
+    const name = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
     cb(null, name);
   },
 });
@@ -41,16 +39,14 @@ const upload = multer({
 });
 
 // ✅ Helper — only return filename (basename)
-const getPublicUrl = (filePath) => {
-  return path.basename(filePath);
-};
+const getPublicUrl = (filePath) => path.basename(filePath);
 
 // 🧩 Get All Products
 const getAllProducts = asyncHandler(async (req, res) => {
   const products = await prisma.product.findMany({
     include: {
-      images: { orderBy: { order: 'asc' } },
-      videos: { orderBy: { order: 'asc' } },
+      images: { orderBy: { order: "asc" } },
+      videos: { orderBy: { order: "asc" } },
       category: { select: { name: true } },
     },
   });
@@ -61,8 +57,15 @@ const getAllProducts = asyncHandler(async (req, res) => {
 const createProduct = asyncHandler(async (req, res) => {
   const files = req.files;
   const {
-    merchantId, slug, title, price, description,
-    manufacturer, categoryId, inStock, mainImageIndex,
+    merchantId,
+    slug,
+    title,
+    price,
+    description,
+    manufacturer,
+    categoryId,
+    inStock,
+    mainImageIndex,
   } = req.body;
 
   if (!title) throw new AppError("Missing required field: title", 400);
@@ -71,10 +74,18 @@ const createProduct = asyncHandler(async (req, res) => {
   if (!price) throw new AppError("Missing required field: price", 400);
   if (!categoryId) throw new AppError("Missing required field: categoryId", 400);
 
-  const imageFiles = files?.filter(f => f.mimetype.startsWith('image/')) || [];
-  const videoFiles = files?.filter(f => !f.mimetype.startsWith('image/')) || [];
+  // ✅ Handle duplicate slug
+  let finalSlug = slug;
+  const existingSlug = await prisma.product.findUnique({ where: { slug } });
+  if (existingSlug) {
+    finalSlug = `${slug}-${Date.now()}`;
+  }
 
-  if (imageFiles.length === 0) throw new AppError("At least one image is required", 400);
+  const imageFiles = files?.filter((f) => f.mimetype.startsWith("image/")) || [];
+  const videoFiles = files?.filter((f) => !f.mimetype.startsWith("image/")) || [];
+
+  if (imageFiles.length === 0)
+    throw new AppError("At least one image is required", 400);
 
   const mainIdx = mainImageIndex ? parseInt(mainImageIndex) : 0;
   const mainImageUrl = getPublicUrl(imageFiles[mainIdx]?.path || imageFiles[0]?.path);
@@ -83,7 +94,7 @@ const createProduct = asyncHandler(async (req, res) => {
     const product = await tx.product.create({
       data: {
         merchantId,
-        slug,
+        slug: finalSlug,
         title,
         price: parseInt(price),
         rating: 5,
@@ -110,13 +121,14 @@ const createProduct = asyncHandler(async (req, res) => {
     }));
 
     if (imageCreates.length > 0) await tx.image.createMany({ data: imageCreates });
-    if (videoCreates.length > 0) await tx.product_video.createMany({ data: videoCreates });
+    if (videoCreates.length > 0)
+      await tx.product_video.createMany({ data: videoCreates });
 
     return await tx.product.findUnique({
       where: { id: product.id },
       include: {
-        images: { orderBy: { order: 'asc' } },
-        videos: { orderBy: { order: 'asc' } },
+        images: { orderBy: { order: "asc" } },
+        videos: { orderBy: { order: "asc" } },
         category: { select: { name: true } },
       },
     });
@@ -130,8 +142,18 @@ const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const files = req.files || [];
   const {
-    merchantId, slug, title, price, rating, description, manufacturer,
-    categoryId, inStock, mainImageIndex, deleteImageIds, deleteVideoIds,
+    merchantId,
+    slug,
+    title,
+    price,
+    rating,
+    description,
+    manufacturer,
+    categoryId,
+    inStock,
+    mainImageIndex,
+    deleteImageIds,
+    deleteVideoIds,
   } = req.body;
 
   if (!id) throw new AppError("Product ID is required", 400);
@@ -145,13 +167,22 @@ const updateProduct = asyncHandler(async (req, res) => {
   });
   if (!existingProduct) throw new AppError("Product not found", 404);
 
+  // ✅ Avoid duplicate slug error during update
+  let finalSlug = slug || existingProduct.slug;
+  if (slug && slug !== existingProduct.slug) {
+    const slugExists = await prisma.product.findUnique({ where: { slug } });
+    if (slugExists) {
+      finalSlug = `${slug}-${Date.now()}`;
+    }
+  }
+
   const updatedProduct = await prisma.$transaction(async (tx) => {
     await tx.product.update({
       where: { id },
       data: {
         merchantId: merchantId || undefined,
         title: title || undefined,
-        slug: slug || undefined,
+        slug: finalSlug,
         price: price ? parseInt(price) : undefined,
         rating: rating ? parseInt(rating) : undefined,
         description: description || undefined,
@@ -161,17 +192,21 @@ const updateProduct = asyncHandler(async (req, res) => {
       },
     });
 
+    // 🧹 Delete selected images/videos
     if (deleteImageIds) {
-      const ids = deleteImageIds.split(',').map(s => s.trim()).filter(Boolean);
-      if (ids.length > 0) await tx.image.deleteMany({ where: { imageID: { in: ids }, productID: id } });
+      const ids = deleteImageIds.split(",").map((s) => s.trim()).filter(Boolean);
+      if (ids.length > 0)
+        await tx.image.deleteMany({ where: { imageID: { in: ids }, productID: id } });
     }
 
     if (deleteVideoIds) {
-      const ids = deleteVideoIds.split(',').map(s => s.trim()).filter(Boolean);
-      if (ids.length > 0) await tx.product_video.deleteMany({ where: { id: { in: ids }, productId: id } });
+      const ids = deleteVideoIds.split(",").map((s) => s.trim()).filter(Boolean);
+      if (ids.length > 0)
+        await tx.product_video.deleteMany({ where: { id: { in: ids }, productId: id } });
     }
 
-    const newImageFiles = files.filter(f => f.mimetype.startsWith('image/'));
+    // 🖼 Add new images
+    const newImageFiles = files.filter((f) => f.mimetype.startsWith("image/"));
     const currentImageCount = await tx.image.count({ where: { productID: id } });
 
     if (newImageFiles.length > 0) {
@@ -184,13 +219,16 @@ const updateProduct = asyncHandler(async (req, res) => {
       await tx.image.createMany({ data: imageData });
 
       const mainIdx = mainImageIndex ? parseInt(mainImageIndex) : 0;
-      const mainImageUrl = getPublicUrl(newImageFiles[mainIdx]?.path || newImageFiles[0]?.path);
+      const mainImageUrl = getPublicUrl(
+        newImageFiles[mainIdx]?.path || newImageFiles[0]?.path
+      );
       if (mainImageUrl) {
         await tx.product.update({ where: { id }, data: { mainImage: mainImageUrl } });
       }
     }
 
-    const newVideoFiles = files.filter(f => !f.mimetype.startsWith('image/'));
+    // 🎥 Add new videos
+    const newVideoFiles = files.filter((f) => !f.mimetype.startsWith("image/"));
     const currentVideoCount = await tx.product_video.count({ where: { productId: id } });
 
     if (newVideoFiles.length > 0) {
@@ -206,8 +244,8 @@ const updateProduct = asyncHandler(async (req, res) => {
     return await tx.product.findUnique({
       where: { id },
       include: {
-        images: { orderBy: { order: 'asc' } },
-        videos: { orderBy: { order: 'asc' } },
+        images: { orderBy: { order: "asc" } },
+        videos: { orderBy: { order: "asc" } },
         category: { select: { name: true } },
       },
     });
@@ -221,8 +259,11 @@ const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   if (!id) throw new AppError("Product ID is required", 400);
 
-  const related = await prisma.customer_order_product.findMany({ where: { productId: id } });
-  if (related.length > 0) throw new AppError("Cannot delete: linked to orders", 400);
+  const related = await prisma.customer_order_product.findMany({
+    where: { productId: id },
+  });
+  if (related.length > 0)
+    throw new AppError("Cannot delete: linked to orders", 400);
 
   await prisma.product.delete({ where: { id } });
   res.status(204).send();
@@ -254,15 +295,15 @@ const getProductById = asyncHandler(async (req, res) => {
     where: { id },
     include: {
       category: true,
-      images: { orderBy: { order: 'asc' } },
-      videos: { orderBy: { order: 'asc' } },
+      images: { orderBy: { order: "asc" } },
+      videos: { orderBy: { order: "asc" } },
     },
   });
   if (!product) throw new AppError("Product not found", 404);
   res.status(200).json(product);
 });
 
-// ✅ Export
+// ✅ Export all
 module.exports = {
   getAllProducts,
   createProduct,

@@ -46,7 +46,9 @@ const handlePrismaError = (error) => {
       return {
         error: "A record with this information already exists",
         details: prismaError.meta?.target
-          ? `Field: ${prismaError.meta.target.join(", ")}`
+          ? `Field: ${Array.isArray(prismaError.meta.target)
+  ? prismaError.meta.target.join(", ")
+  : prismaError.meta.target}`
           : undefined,
         timestamp: new Date().toISOString(),
       };
