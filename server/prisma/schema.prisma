@@ -7,31 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* ----------------------------- Customer Order Product ----------------------------- */
+/**
+ * ----------------------------- Customer Order Product -----------------------------
+ */
 model customer_order_product {
-  id              String  @id @default(uuid())
+  id              String @id @default(uuid())
   customerOrderId String
   productId       String
   quantity        Int
 
-  customerOrder   customer_order @relation(fields: [customerOrderId], references: [id])
-  product         product        @relation(fields: [productId], references: [id])
+  customerOrder customer_order @relation(fields: [customerOrderId], references: [id])
+  product       product        @relation(fields: [productId], references: [id])
 
   @@index([customerOrderId])
   @@index([productId])
 }
 
-/* ----------------------------- Category ----------------------------- */
+/**
+ * ----------------------------- Category -----------------------------
+ */
 model category {
-  id        String    @id @default(uuid())
-  name      String    @unique // ✅ removed duplicate map name
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  product   product[]
+  product product[]
 }
 
-/* ----------------------------- Customer Order ----------------------------- */
+/**
+ * ----------------------------- Customer Order -----------------------------
+ */
 model customer_order {
   id          String    @id @default(uuid())
   name        String
@@ -51,74 +57,83 @@ model customer_order {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
 
-  products    customer_order_product[]
+  products customer_order_product[]
 }
 
-/* ----------------------------- Merchant ----------------------------- */
+/**
+ * ----------------------------- Merchant -----------------------------
+ */
 model merchant {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
   email       String?
   phone       String?
   address     String?
-  status      String    @default("ACTIVE")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  status      String   @default("ACTIVE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now()) @updatedAt
 
-  product     product[]
+  product        product[]
+  adminMerchants admin_merchant[]
 }
 
-/* ----------------------------- Notification ----------------------------- */
+/**
+ * ----------------------------- Notification -----------------------------
+ */
 model notification {
-  id        String    @id @default(uuid())
+  id        String                @id @default(uuid())
   userId    String
   title     String
-  message   String    @db.Text
+  message   String                @db.Text
   type      notification_type
-  isRead    Boolean   @default(false)
+  isRead    Boolean               @default(false)
   priority  notification_priority @default(NORMAL)
-  metadata  String?   @db.LongText
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  metadata  String?               @db.LongText
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @default(now()) @updatedAt
 
-  user      user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user user @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@index([createdAt])
+  @@index([createdAt])
   @@index([userId])
   @@index([userId, isRead])
   @@index([userId, type])
-
 }
 
-/* ----------------------------- Product ----------------------------- */
+/**
+ * ----------------------------- Product -----------------------------
+ */
 model product {
-  id             String           @id @default(uuid())
-  slug           String           @unique
-  title          String
-  mainImage      String
-  price          Int              @default(0)
-  rating         Int              @default(0)
-  description    String
-  manufacturer   String
-  inStock        Int              @default(1)
-  categoryId     String
-  merchantId     String
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @default(now()) @updatedAt
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  title        String
+  mainImage    String
+  price        Int      @default(0)
+  rating       Int      @default(0)
+  description  String
+  manufacturer String
+  inStock      Int      @default(1)
+  categoryId   String
+  merchantId   String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @default(now()) @updatedAt
 
   customerOrders customer_order_product[]
-  category       category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  merchant       merchant         @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  category       category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  merchant       merchant                 @relation(fields: [merchantId], references: [id], onDelete: Cascade)
   wishlist       wishlist[]
-  images         image[]          // ✅ removed named relation (simplified)
-  videos         product_video[]  // ✅ removed named relation (simplified)
+  images         image[]
+  videos         product_video[]
+  discounts      product_discount[]        // ✅ added relation for discount
 
   @@index([categoryId])
   @@index([merchantId])
 }
 
-/* ----------------------------- Image ----------------------------- */
+/**
+ * ----------------------------- Image -----------------------------
+ */
 model image {
   imageID   String  @id @default(uuid())
   productID String
@@ -126,12 +141,14 @@ model image {
   altText   String? @default("")
   order     Int     @default(0)
 
-  product   product @relation(fields: [productID], references: [id], onDelete: Cascade)
+  product product @relation(fields: [productID], references: [id], onDelete: Cascade)
 
   @@index([productID])
 }
 
-/* ----------------------------- Product Video ----------------------------- */
+/**
+ * ----------------------------- Product Video -----------------------------
+ */
 model product_video {
   id        String  @id @default(uuid())
   productId String
@@ -140,39 +157,46 @@ model product_video {
   thumbnail String? @default("")
   order     Int     @default(0)
 
-  product   product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@index([productId])
 }
 
-/* ----------------------------- User ----------------------------- */
+/**
+ * ----------------------------- User -----------------------------
+ */
 model user {
-  id        String    @id @default(uuid())
-  email     String    @unique
+  id        String   @id @default(uuid())
+  email     String   @unique
   password  String?
-  role      String?   @default("user")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  role      String?  @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  notification notification[]
-  wishlist     wishlist[]
-  wallet       wallet?
+  notification   notification[]
+  wishlist       wishlist[]
+  wallet         wallet?
+  adminMerchants admin_merchant[]
 }
 
-/* ----------------------------- Wishlist ----------------------------- */
+/**
+ * ----------------------------- Wishlist -----------------------------
+ */
 model wishlist {
-  id        String  @id @default(uuid())
+  id        String @id @default(uuid())
   productId String
   userId    String
 
-  product   product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  user      user    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user    user    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([productId])
   @@index([userId])
 }
 
-/* ----------------------------- Enums ----------------------------- */
+/**
+ * ----------------------------- Enums -----------------------------
+ */
 enum notification_type {
   ORDER_UPDATE
   PAYMENT_STATUS
@@ -187,23 +211,27 @@ enum notification_priority {
   URGENT
 }
 
-/* ----------------------------- Wallet ----------------------------- */
+/**
+ * ----------------------------- Wallet -----------------------------
+ */
 model wallet {
-  id        String    @id @default(uuid())
-  userId    String    @unique
-  balance   Int       @default(0)
-  currency  String    @default("INR")
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @default(now()) @updatedAt
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Int      @default(0)
+  currency  String   @default("INR")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
-  user         user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         user                @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions walletTransaction[]
 }
 
-/* ----------------------------- Wallet Transaction ----------------------------- */
+/**
+ * ----------------------------- Wallet Transaction -----------------------------
+ */
 model walletTransaction {
-  id          String    @id @default(uuid())
+  id          String             @id @default(uuid())
   walletId    String
   amount      Int
   type        transaction_type
@@ -211,10 +239,10 @@ model walletTransaction {
   description String?
   reference   String?
   metadata    Json?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @default(now()) @updatedAt
 
-  wallet      wallet    @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  wallet wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
 
   @@index([walletId])
   @@index([type])
@@ -222,7 +250,9 @@ model walletTransaction {
   @@index([createdAt])
 }
 
-/* ----------------------------- Transaction Enums ----------------------------- */
+/**
+ * ----------------------------- Transaction Enums -----------------------------
+ */
 enum transaction_type {
   CREDIT
   DEBIT
@@ -236,4 +266,40 @@ enum transaction_status {
   COMPLETED
   FAILED
   CANCELLED
+}
+
+/**
+ * ----------------------------- Admin Merchant Assignment -----------------------------
+ */
+model admin_merchant {
+  id         String   @id @default(uuid())
+  adminId    String
+  merchantId String
+  assignedAt DateTime @default(now())
+  updatedAt  DateTime @default(now()) @updatedAt
+
+  admin    user     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  merchant merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  @@unique([adminId, merchantId])
+  @@index([adminId])
+  @@index([merchantId])
+}
+
+/**
+ * ----------------------------- Product Discount -----------------------------
+ */
+model product_discount {
+  id              String   @id @default(uuid())
+  productId       String
+  minQuantity     Int
+  maxQuantity     Int
+  discountPercent Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @default(now()) @updatedAt
+
+  product product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([minQuantity, maxQuantity])
 }

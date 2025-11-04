@@ -26,12 +26,28 @@ export default function MerchantPage() {
   const fetchMerchants = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get("/api/merchants");
-      if (!response.ok) {
-        throw new Error("Failed to fetch merchants");
+      // Get current user session to get admin ID
+      const sessionResponse = await fetch("/api/auth/session");
+      const session = await sessionResponse.json();
+      const adminId = session?.user?.id;
+      
+      if (adminId) {
+        // Fetch merchants assigned to this admin
+        const response = await apiClient.get(`/api/admin/${adminId}/merchants`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch merchants");
+        }
+        const data = await response.json();
+        setMerchants(data);
+      } else {
+        // Fallback to all merchants if no admin ID
+        const response = await apiClient.get("/api/merchants");
+        if (!response.ok) {
+          throw new Error("Failed to fetch merchants");
+        }
+        const data = await response.json();
+        setMerchants(data);
       }
-      const data = await response.json();
-      setMerchants(data);
     } catch (error) {
       console.error("Error fetching merchants:", error);
       toast.error("Failed to load merchants");

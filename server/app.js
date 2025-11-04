@@ -20,6 +20,10 @@ const bulkUploadRouter = require("./routes/bulkUpload");
 const walletRouter = require("./routes/wallet");
 const cors = require("cors");
 const productVideoRoutes = require("./routes/productVideos");
+const adminMerchantRoute = require("./routes/adminMerchantRoute");
+
+
+
 
 
 const {
@@ -87,6 +91,7 @@ app.use(cors(corsOptions));
 
 // ✅ Allow JSON payloads
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // ✅ Serve all files from /public folder
 app.use(express.static(path.join(__dirname, "public"))); // 🔥 This line enables /public image access
@@ -123,6 +128,10 @@ app.use("/api/bulk-upload", bulkUploadRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/wallet", walletRouter);
 app.use("/api/productVideos", productVideoRoutes);
+app.use("/api/admin-merchants", adminMerchantRoute);
+app.use("/api/product-discounts", require("./routes/productDiscountRoute"));
+
+
 
 // ✅ Health Check Endpoint
 app.get("/health", (req, res) => {

@@ -3,9 +3,9 @@ import React from "react";
 import Image from "next/image";
 
 // ✅ Import images directly (instead of string paths)
-import promo1 from "@/public/1761850281533-164197404.jpeg";
+// import promo1 from "@/public/1761850281533-164197404.jpeg";
 import promo2 from "@/public/custom/backgrounddarkhero.png";
-import promo3 from "@/public/1761888897326-653269807.webp";
+// import promo3 from "@/public/1761888897326-653269807.webp";
 
 interface Banner {
   title: string;
@@ -30,7 +30,7 @@ const banners: Banner[] = [
     ctaText: "Buy Now",
     ctaLink: "#",
     bgColor: "#F5F5F7",
-    imageSrc: promo1,
+    imageSrc: "",
     imageWidth: 274,
     imageHeight: 350,
     textAlign: "left",
@@ -55,7 +55,7 @@ const banners: Banner[] = [
     ctaText: "Buy Now",
     ctaLink: "#",
     bgColor: "#FFECE1",
-    imageSrc: promo3,
+    imageSrc: "",
     imageWidth: 200,
     imageHeight: 200,
     textAlign: "left",

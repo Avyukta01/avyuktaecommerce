@@ -54,6 +54,7 @@ const getAllProducts = asyncHandler(async (req, res) => {
 });
 
 // 🆕 Create Product
+// 🆕 Create Product
 const createProduct = asyncHandler(async (req, res) => {
   const files = req.files;
   const {
@@ -90,8 +91,8 @@ const createProduct = asyncHandler(async (req, res) => {
   const mainIdx = mainImageIndex ? parseInt(mainImageIndex) : 0;
   const mainImageUrl = getPublicUrl(imageFiles[mainIdx]?.path || imageFiles[0]?.path);
 
-  const result = await prisma.$transaction(async (tx) => {
-    const product = await tx.product.create({
+  const product = await prisma.$transaction(async (tx) => {
+    const createdProduct = await tx.product.create({
       data: {
         merchantId,
         slug: finalSlug,
@@ -107,14 +108,14 @@ const createProduct = asyncHandler(async (req, res) => {
     });
 
     const imageCreates = imageFiles.map((file, idx) => ({
-      productID: product.id,
+      productID: createdProduct.id,
       image: getPublicUrl(file.path),
       order: idx,
       altText: `${title} - image ${idx + 1}`,
     }));
 
     const videoCreates = videoFiles.map((file, idx) => ({
-      productId: product.id,
+      productId: createdProduct.id,
       videoUrl: getPublicUrl(file.path),
       title: `${title} video ${idx + 1}`,
       order: idx,
@@ -124,8 +125,9 @@ const createProduct = asyncHandler(async (req, res) => {
     if (videoCreates.length > 0)
       await tx.product_video.createMany({ data: videoCreates });
 
+    // ✅ Return the full product
     return await tx.product.findUnique({
-      where: { id: product.id },
+      where: { id: createdProduct.id },
       include: {
         images: { orderBy: { order: "asc" } },
         videos: { orderBy: { order: "asc" } },
@@ -133,9 +135,14 @@ const createProduct = asyncHandler(async (req, res) => {
       },
     });
   });
-
-  res.status(201).json(result);
+console.log("📤 Product response:", product);
+  // ✅ Explicitly ensure the response includes product.id
+  return res.status(201).json({
+    id: product.id,
+    ...product,
+  });
 });
+
 
 // ✏️ Update Product
 const updateProduct = asyncHandler(async (req, res) => {

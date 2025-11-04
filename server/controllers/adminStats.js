@@ -72,6 +72,16 @@ async function getDashboardStats(request, response) {
     });
 
 
+    // Get admins and merchants count for superAdmin dashboard
+    const [adminsCount, merchantsCount] = await Promise.all([
+      prisma.user.count({
+        where: {
+          role: "admin"
+        }
+      }),
+      prisma.merchant.count()
+    ]);
+
     return response.json({
       customers,
       orders,
@@ -81,8 +91,9 @@ async function getDashboardStats(request, response) {
       walletBalance: totalWalletBalance,
       activeWallets,
       recentTransactions,
-      transactionStats
-
+      transactionStats,
+      admins: adminsCount,
+      merchants: merchantsCount
     });
   } catch (error) {
     console.error("Error fetching dashboard stats:", error);

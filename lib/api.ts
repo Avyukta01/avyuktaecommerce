@@ -39,8 +39,14 @@ export const apiClient = {
         : (data ? JSON.stringify(data) : undefined),
     }),
     
-  delete: (endpoint: string, options?: RequestInit) =>
-    apiClient.request(endpoint, { ...options, method: 'DELETE' }),
+  delete: (endpoint: string, data?: any, options?: RequestInit) =>
+    apiClient.request(endpoint, {
+      ...options,
+      method: 'DELETE',
+      body: (typeof FormData !== 'undefined' && data instanceof FormData)
+        ? data
+        : (data ? JSON.stringify(data) : undefined),
+    }),
 };
 
 export default apiClient;

@@ -154,7 +154,7 @@ const DashboardSidebar = () => {
           </div>
         </Link>
 
-        <Link href="/admin/merchant">
+        {/* <Link href="/admin/merchant">
           <div className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${
             pathname === "/admin/merchant" 
               ? "bg-blue-600 text-white shadow-sm" 
@@ -167,7 +167,7 @@ const DashboardSidebar = () => {
             }`} />
             <span>Merchant</span>
           </div>
-        </Link>
+        </Link> */}
 
         {/* <Link href="/admin/settings">
           <div className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${

@@ -53,8 +53,10 @@ export const authOptions: NextAuthOptions = {
                 id: user.id,
                 email: user.email,
                 role: user.role,
+                
               };
             }
+            console.log(user.role);
           }
         } catch (err: any) {
           throw new Error(err);
@@ -98,17 +100,32 @@ export const authOptions: NextAuthOptions = {
     },
 
     async jwt({ token, user }: { token: JWT; user?: AuthUser }): Promise<JWT> {
+      // On initial sign-in, persist id and role into the JWT
       if (user) {
         token.role = user.role;
         token.id = user.id;
         token.iat = Math.floor(Date.now() / 1000);
       }
-      
+
+      // Ensure role is always present on subsequent requests
+      // This covers cases where the token was created without role or role changed in DB
+      if ((!token.role || !token.id) && token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id },
+            select: { role: true }
+          });
+          if (dbUser?.role) {
+            token.role = dbUser.role;
+          }
+        } catch {}
+      }
+
       const now = Math.floor(Date.now() / 1000);
-      const tokenAge = now - (token.iat as number);
+      const tokenAge = token.iat ? now - (token.iat as number) : 0;
       const maxAge = 15 * 60;
       
-      if (tokenAge > maxAge) {
+      if (token.iat && tokenAge > maxAge) {
         return {};
       }
       
@@ -119,6 +136,10 @@ export const authOptions: NextAuthOptions = {
       if (token) {
         session.user.role = token.role;
         session.user.id = token.id;
+      }
+      // Ensure role is always set
+      if (!session.user.role) {
+        session.user.role = "user";
       }
       return session;
     },

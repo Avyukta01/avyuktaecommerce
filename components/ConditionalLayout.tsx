@@ -10,16 +10,17 @@ interface ConditionalLayoutProps {
 
 const ConditionalLayout = ({ children }: ConditionalLayoutProps) => {
   const pathname = usePathname();
-  
-  // Check if current path is an admin page
-  const isAdminPage = pathname?.startsWith('/admin');
-  
-  // If it's an admin page, don't render the main website header/footer
+
+  //  Check if current path is an admin or super-admin page
+  const isAdminPage =
+    pathname?.startsWith("/admin") || pathname?.startsWith("/super-admin");
+
+  //  If it's an admin or super-admin page, hide Header/Footer
   if (isAdminPage) {
     return <>{children}</>;
   }
-  
-  // For non-admin pages, render with header and footer
+
+  //  For normal user pages, show header and footer
   return (
     <>
       <Header />

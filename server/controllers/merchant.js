@@ -7,6 +7,17 @@ async function getAllMerchants(request, response) {
     const merchants = await prisma.merchant.findMany({
       include: {
         product: true,
+        adminMerchants: {
+          include: {
+            admin: {
+              select: {
+                id: true,
+                email: true,
+                role: true
+              }
+            }
+          }
+        }
       },
     });
     return response.json(merchants);

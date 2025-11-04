@@ -15,6 +15,13 @@ interface DashboardProductDetailsProps {
   params: Promise<{ id: string }>;
 }
 
+interface DiscountRange {
+  minQuantity: number;
+  maxQuantity: number;
+  discountPercent: number;
+}
+
+
 const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   const resolvedParams = use(params);
   const id = resolvedParams.id;
@@ -23,6 +30,16 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   const [categories, setCategories] = useState<Category[]>();
   const [otherImages, setOtherImages] = useState<OtherImages[]>([]);
   const router = useRouter();
+
+  const [discountRanges, setDiscountRanges] = useState<DiscountRange[]>([]);
+const [newDiscount, setNewDiscount] = useState<DiscountRange>({
+  minQuantity: 0,
+  maxQuantity: 0,
+  discountPercent: 0,
+});
+const [loadingDiscounts, setLoadingDiscounts] = useState(false);
+const [savingDiscounts, setSavingDiscounts] = useState(false);
+
 
   // functionality for deleting product
   const deleteProduct = async () => {
@@ -81,6 +98,81 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
     }
   };
 
+
+  const fetchDiscounts = async () => {
+  try {
+    setLoadingDiscounts(true);
+    const res = await apiClient.get(`/api/product-discounts/${id}`);
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.message || "Failed to load discounts");
+      return;
+    }
+    const data: DiscountRange[] = await res.json();
+    setDiscountRanges(Array.isArray(data) ? data : []);
+  } catch {
+    toast.error("Failed to load discounts");
+  } finally {
+    setLoadingDiscounts(false);
+  }
+};
+
+
+
+const addDiscountRange = () => {
+  const { minQuantity, maxQuantity, discountPercent } = newDiscount;
+
+  if (!minQuantity || !maxQuantity || !discountPercent) {
+    toast.error("Please fill all discount fields");
+    return;
+  }
+  if (minQuantity > maxQuantity) {
+    toast.error("Min quantity cannot be greater than max quantity");
+    return;
+  }
+
+  setDiscountRanges((prev) => [...prev, { ...newDiscount }]);
+  setNewDiscount({ minQuantity: 0, maxQuantity: 0, discountPercent: 0 });
+};
+
+const removeDiscount = (index: number) => {
+  setDiscountRanges((prev) => prev.filter((_, i) => i !== index));
+};
+
+const saveDiscounts = async () => {
+  if (!id) {
+    toast.error("Missing product id");
+    return;
+  }
+  if (discountRanges.length === 0) {
+    toast("No discount ranges to save", { icon: "ℹ️" });
+    return;
+  }
+
+  try {
+    setSavingDiscounts(true);
+    const res = await apiClient.post("/api/product-discounts", {
+      productId: id,
+      discounts: discountRanges,
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      toast.error(err.message || "Failed to save discounts");
+      return;
+    }
+
+    toast.success(`${discountRanges.length} discount range(s) saved!`);
+    await fetchDiscounts(); // refresh with server truth
+  } catch {
+    toast.error("Failed to save discounts");
+  } finally {
+    setSavingDiscounts(false);
+  }
+};
+
+
+
   // functionality for uploading main image file
   const uploadFile = async (file: any) => {
     const formData = new FormData();
@@ -136,7 +228,11 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
   useEffect(() => {
     fetchCategories();
     fetchProductData();
+    fetchDiscounts(); 
   }, [id]);
+
+  
+
 
   return (
 
@@ -300,7 +396,105 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
 
         </div>
       
-        
+                {/* Discount Ranges (Optional) */}
+<div className="mt-8 w-full lg:w-2/3">
+  <h3 className="text-xl font-semibold mb-4">Discount </h3>
+
+  {/* Add new discount inputs */}
+  <div className="flex flex-wrap gap-4 mb-4">
+    <input
+      type="number"
+      placeholder="Min Qty"
+      value={newDiscount.minQuantity || ""}
+      onChange={(e) =>
+        setNewDiscount({ ...newDiscount, minQuantity: Number(e.target.value) })
+      }
+      className="px-4 py-2 border rounded-lg w-24 focus:ring-2 focus:ring-blue-500"
+    />
+    <input
+      type="number"
+      placeholder="Max Qty"
+      value={newDiscount.maxQuantity || ""}
+      onChange={(e) =>
+        setNewDiscount({ ...newDiscount, maxQuantity: Number(e.target.value) })
+      }
+      className="px-4 py-2 border rounded-lg w-24 focus:ring-2 focus:ring-blue-500"
+    />
+    <input
+      type="number"
+      placeholder="Discount %"
+      value={newDiscount.discountPercent || ""}
+      onChange={(e) =>
+        setNewDiscount({
+          ...newDiscount,
+          discountPercent: Number(e.target.value),
+        })
+      }
+      className="px-4 py-2 border rounded-lg w-28 focus:ring-2 focus:ring-blue-500"
+    />
+    <button
+      type="button"
+      onClick={addDiscountRange}
+      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+    >
+      Add
+    </button>
+  </div>
+
+  {/* Show list */}
+  <div className="overflow-x-auto border rounded-lg">
+    <table className="w-full text-sm text-left">
+      <thead className="bg-gray-100">
+        <tr>
+          <th className="px-4 py-2">Min Qty</th>
+          <th className="px-4 py-2">Max Qty</th>
+          <th className="px-4 py-2">Discount %</th>
+          <th className="px-4 py-2 text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {loadingDiscounts ? (
+          <tr>
+            <td className="px-4 py-3" colSpan={4}>Loading discounts…</td>
+          </tr>
+        ) : discountRanges.length > 0 ? (
+          discountRanges.map((d, i) => (
+            <tr key={`${d.minQuantity}-${d.maxQuantity}-${i}`} className="border-t">
+              <td className="px-4 py-2">{d.minQuantity}</td>
+              <td className="px-4 py-2">{d.maxQuantity}</td>
+              <td className="px-4 py-2">{d.discountPercent}%</td>
+              <td className="px-4 py-2 text-right">
+                <button
+                  onClick={() => removeDiscount(i)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td className="px-4 py-3" colSpan={4}>No discount ranges added</td>
+          </tr>
+        )}
+      </tbody>
+    </table>
+  </div>
+
+  {/* Save button */}
+  <div className="mt-4">
+    <button
+      type="button"
+      onClick={saveDiscounts}
+      disabled={savingDiscounts}
+      className="px-5 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+    >
+      {savingDiscounts ? "Saving…" : "Save Discounts"}
+    </button>
+  </div>
+</div>
+
         <div className="flex justify-start items-center gap-x-10 max-sm:flex-col">
           <div className="w-full lg:w-1/2">
           <div>
@@ -319,6 +513,8 @@ const DashboardProductDetails = ({ params }: DashboardProductDetailsProps) => {
         </div>
           </div>
         </div>
+
+
         
         {/* Product description div - end */}
         {/* Action buttons div - start */}

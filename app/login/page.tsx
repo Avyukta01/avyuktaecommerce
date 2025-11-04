@@ -14,18 +14,31 @@ const LoginPage = () => {
   const { data: session, status: sessionStatus } = useSession();
 
   useEffect(() => {
-    // Check if session expired
-    const expired = searchParams.get('expired');
-    if (expired === 'true') {
+    const expired = searchParams.get("expired");
+    if (expired === "true") {
       setError("Your session has expired. Please log in again.");
       toast.error("Your session has expired. Please log in again.");
     }
-    
-    // if user has already logged in redirect to home page
-    if (sessionStatus === "authenticated") {
-      router.replace("/");
+
+    if (sessionStatus === "authenticated" && session?.user) {
+      const userRole = (session as any)?.user?.role;
+      const userId = (session as any)?.user?.id;
+
+      // ✅ Store adminId in localStorage
+      if (userId) {
+        localStorage.setItem("adminId", userId);
+      }
+
+      // ✅ Redirect based on role
+      if (userRole === "super_admin") {
+        router.replace("/super-admin");
+      } else if (userRole === "admin") {
+        router.replace("/admin");
+      } else {
+        router.replace("/");
+      }
     }
-  }, [sessionStatus, router, searchParams]);
+  }, [sessionStatus, router, searchParams, session]);
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -53,16 +66,43 @@ const LoginPage = () => {
     if (res?.error) {
       setError("Invalid email or password");
       toast.error("Invalid email or password");
-      if (res?.url) router.replace("/");
     } else {
       setError("");
       toast.success("Successful login");
+
+      // ✅ Fetch session and store adminId, then redirect
+      setTimeout(() => {
+        fetch("/api/auth/session")
+          .then((res) => res.json())
+          .then((data) => {
+            const role = (data?.user as any)?.role;
+            const userId = (data?.user as any)?.id;
+
+            // ✅ Store adminId in localStorage
+            if (userId) {
+              localStorage.setItem("adminId", userId);
+            }
+
+            // ✅ Redirect based on role
+            if (role === "super_admin") {
+              router.replace("/super-admin");
+            } else if (role === "admin") {
+              router.replace("/admin");
+            } else {
+              router.replace("/");
+            }
+          })
+          .catch(() => {
+            router.replace("/");
+          });
+      }, 200);
     }
   };
 
   if (sessionStatus === "loading") {
     return <h1>Loading...</h1>;
   }
+
   return (
     <div className="bg-white">
       <SectionTitle title="Login" path="Home | Login" />
@@ -203,6 +243,7 @@ const LoginPage = () => {
                   </span>
                 </button>
               </div>
+
               <p className="text-red-600 text-center text-[16px] my-4">
                 {error && error}
               </p>

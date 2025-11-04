@@ -4,10 +4,22 @@ import React, { useEffect, useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import AdminLayout from "@/components/AdminLayout";
-import apiClient from "@/lib/api"; // ADD: use your apiClient
-import { convertCategoryNameToURLFriendly as convertSlugToURLFriendly } from "@/utils/categoryFormating";
-import { sanitizeFormData } from "@/lib/form-sanitize";
-import { FaPlus, FaUpload, FaSave, FaArrowLeft, FaImage, FaTag, FaStore, FaBox, FaDollarSign, FaCog, FaVideo, FaTrash, FaStar } from "react-icons/fa";
+import apiClient from "@/lib/api";
+import {
+  FaPlus,
+  FaUpload,
+  FaSave,
+  FaArrowLeft,
+  FaImage,
+  FaTag,
+  FaStore,
+  FaBox,
+  FaDollarSign,
+  FaCog,
+  FaVideo,
+  FaTrash,
+  FaStar,
+} from "react-icons/fa";
 
 interface Product {
   merchantId: string;
@@ -40,7 +52,7 @@ interface MediaFile {
   isMain?: boolean;
 }
 
-// ADD: Drag & Drop Upload Component (unchanged)
+// Media Uploader Component (Unchanged)
 const MediaUploader: React.FC<{
   files: MediaFile[];
   setFiles: React.Dispatch<React.SetStateAction<MediaFile[]>>;
@@ -80,19 +92,21 @@ const MediaUploader: React.FC<{
         });
       }
     }
-    setFiles(prev => [...prev, ...newFiles]);
+    setFiles((prev) => [...prev, ...newFiles]);
   };
 
   const removeFile = (id: string) => {
-    setFiles(prev => prev.filter(f => f.id !== id));
-    URL.revokeObjectURL(files.find(f => f.id === id)?.preview || "");
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+    URL.revokeObjectURL(files.find((f) => f.id === id)?.preview || "");
   };
 
   const setAsMain = (id: string) => {
-    setFiles(prev => prev.map(f => ({
-      ...f,
-      isMain: f.id === id
-    })));
+    setFiles((prev) =>
+      prev.map((f) => ({
+        ...f,
+        isMain: f.id === id,
+      }))
+    );
   };
 
   return (
@@ -103,7 +117,9 @@ const MediaUploader: React.FC<{
         onDragOver={handleDrag}
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-          dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+          dragActive
+            ? "border-blue-500 bg-blue-50"
+            : "border-gray-300 hover:border-gray-400"
         }`}
       >
         <input
@@ -126,7 +142,6 @@ const MediaUploader: React.FC<{
         </label>
       </div>
 
-      {/* Preview Grid */}
       {files.length > 0 && (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {files.map((media) => (
@@ -148,7 +163,6 @@ const MediaUploader: React.FC<{
                 />
               )}
 
-              {/* Overlay */}
               <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all flex items-center justify-center">
                 <div className="opacity-0 group-hover:opacity-100 transition-opacity space-x-2">
                   <button
@@ -171,14 +185,12 @@ const MediaUploader: React.FC<{
                 </div>
               </div>
 
-              {/* Main Badge */}
               {media.isMain && (
                 <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 text-xs font-bold rounded">
                   MAIN
                 </div>
               )}
 
-              {/* Type Icon */}
               <div className="absolute bottom-2 right-2">
                 {media.type === "image" ? (
                   <FaImage className="text-white drop-shadow" />
@@ -194,6 +206,7 @@ const MediaUploader: React.FC<{
   );
 };
 
+// MAIN COMPONENT
 const AddNewProduct = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -210,32 +223,85 @@ const AddNewProduct = () => {
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [merchants, setMerchants] = useState<Merchant[]>([]);
-  
-  // ADD: Media files state
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
-  // ADD: Auto-generate slug from title
+  const [discountRanges, setDiscountRanges] = useState<
+    { minQuantity: number; maxQuantity: number; discountPercent: number }[]
+  >([]);
+
+  const [newDiscount, setNewDiscount] = useState({
+    minQuantity: 0,
+    maxQuantity: 0,
+    discountPercent: 0,
+  });
+
+  const addDiscountRange = () => {
+    const { minQuantity, maxQuantity, discountPercent } = newDiscount;
+
+    if (!minQuantity || !maxQuantity || !discountPercent) {
+      toast.error("Please fill all discount fields");
+      return;
+    }
+
+    if (minQuantity <= 0 || maxQuantity <= 0 || discountPercent <= 0) {
+      toast.error("All discount values must be greater than 0");
+      return;
+    }
+
+    if (minQuantity > maxQuantity) {
+      toast.error("Min quantity cannot be greater than max quantity");
+      return;
+    }
+
+    if (discountPercent > 100) {
+      toast.error("Discount cannot exceed 100%");
+      return;
+    }
+
+    setDiscountRanges((prev) => [...prev, { ...newDiscount }]);
+    setNewDiscount({ minQuantity: 0, maxQuantity: 0, discountPercent: 0 });
+  };
+
+  const removeDiscount = (index: number) => {
+    setDiscountRanges((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // Auto Slug
   useEffect(() => {
-    if (product.title) {
+    if (product.title.trim()) {
       const slug = product.title
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
-      setProduct(prev => ({ ...prev, slug }));
+      setProduct((prev) => ({ ...prev, slug }));
     }
   }, [product.title]);
 
-  // FIXED: Ensure at least one image is set as main
+  // Ensure main image
   useEffect(() => {
-    if (mediaFiles.length > 0 && !mediaFiles.some(f => f.isMain)) {
-      setMediaFiles(prev => prev.map((f, i) => ({ ...f, isMain: i === 0 })));
+    if (mediaFiles.length > 0 && !mediaFiles.some((f) => f.isMain)) {
+      setMediaFiles((prev) => prev.map((f, i) => ({ ...f, isMain: i === 0 })));
     }
   }, [mediaFiles]);
 
-  // FIXED: Corrected addProduct function (only change: removed headers)
+  // FULL VALIDATION
+  const validateForm = () => {
+    if (!product.title.trim()) return "Product name is required";
+    if (!product.description.trim()) return "Description is required";
+    if (!product.merchantId) return "Please select a merchant";
+    if (!product.categoryId) return "Please select a category";
+    if (product.price <= 0) return "Price must be greater than 0";
+    if (product.inStock < 0) return "Stock cannot be negative";
+    if (mediaFiles.length === 0) return "Please upload at least one image";
+    if (!mediaFiles.some((f) => f.isMain)) return "Please set a main image";
+
+    return null;
+  };
+
   const addProduct = async () => {
-    if (!product.merchantId || !product.title || !product.description || mediaFiles.length === 0) {
-      toast.error("Please fill all required fields and upload at least one image");
+    const error = validateForm();
+    if (error) {
+      toast.error(error);
       return;
     }
 
@@ -244,18 +310,15 @@ const AddNewProduct = () => {
 
     try {
       const formData = new FormData();
-      
-      // Append product data
       formData.append("merchantId", product.merchantId);
-      formData.append("title", product.title);
+      formData.append("title", product.title.trim());
       formData.append("price", product.price.toString());
-      formData.append("description", product.description);
-      formData.append("manufacturer", product.manufacturer || "");
+      formData.append("description", product.description.trim());
+      formData.append("manufacturer", product.manufacturer.trim());
       formData.append("inStock", product.inStock.toString());
       formData.append("slug", product.slug);
       formData.append("categoryId", product.categoryId);
 
-      // Append all media files under "media" field
       mediaFiles.forEach((media, index) => {
         formData.append("media", media.file);
         if (media.isMain) {
@@ -263,15 +326,31 @@ const AddNewProduct = () => {
         }
       });
 
-      // FIXED: No headers → Let browser set boundary automatically
       const response = await apiClient.post("/api/products", formData);
-      // const response = await apiClient.post("/api/products", formData);
+      const data = await response.json();
+      const productId = data.id;
+
+      if (!productId) {
+        toast.error("Failed to get Product ID from server");
+        return;
+      }
 
       toast.success("Product created successfully!");
-      router.push("/admin/products");
 
+      if (discountRanges.length > 0) {
+        try {
+          await apiClient.post("/api/product-discounts", {
+            productId,
+            discounts: discountRanges,
+          });
+          toast.success(`${discountRanges.length} discount range(s) saved!`);
+        } catch (err: any) {
+          toast.error("Discounts failed to save: " + err.message);
+        }
+      }
+
+      router.push("/admin/products");
     } catch (error: any) {
-      console.error("Error:", error);
       toast.error(error.message || "Failed to create product");
     } finally {
       setLoading(false);
@@ -279,26 +358,43 @@ const AddNewProduct = () => {
     }
   };
 
+  // Fetch merchants
   const fetchMerchants = async () => {
     try {
-      const res = await apiClient.get("/api/merchants");
-      const data: Merchant[] = await res.json();
-      setMerchants(Array.isArray(data) ? data : []);
-      if (data && data.length > 0) {
-        setProduct(prev => ({ ...prev, merchantId: prev.merchantId || data[0].id }));
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) {
+        toast.error("Please login again!");
+        return;
       }
-    } catch (e) {
-      toast.error("Failed to load merchants");
+
+      const response = await apiClient.get(`/api/admin-merchants?adminId=${adminId}`);
+      const data = await response.json();
+      const merchants = Array.isArray(data) ? data : [];
+
+      if (merchants.length === 0) {
+        toast("No merchants assigned", { icon: "Warning" });
+        setMerchants([]);
+        return;
+      }
+
+      setMerchants(merchants);
+      setProduct((prev) => ({ ...prev, merchantId: merchants[0].id }));
+    } catch (error: any) {
+      setMerchants([]);
     }
   };
 
+  // Fetch categories
   const fetchCategories = async () => {
     try {
       const res = await apiClient.get(`/api/categories`);
       const data: Category[] = await res.json();
       setCategories(Array.isArray(data) ? data : []);
       if (data && data.length > 0) {
-        setProduct(prev => ({ ...prev, categoryId: prev.categoryId || data[0].id }));
+        setProduct((prev) => ({
+          ...prev,
+          categoryId: prev.categoryId || data[0].id,
+        }));
       }
     } catch (error) {
       toast.error("Failed to load categories");
@@ -313,11 +409,9 @@ const AddNewProduct = () => {
   return (
     <AdminLayout title="Add New Product">
       <div className="max-w-6xl mx-auto">
-       
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-8">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left: Form */}
               <div className="lg:col-span-2 space-y-8">
                 {/* Basic Info */}
                 <div>
@@ -364,20 +458,22 @@ const AddNewProduct = () => {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Price (₹)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Price (₹) *</label>
                       <input
                         type="number"
                         value={product.price}
-                        onChange={(e) => setProduct({ ...product, price: Number(e.target.value) })}
+                        onChange={(e) => setProduct({ ...product, price: Number(e.target.value) || 0 })}
+                        min="1"
                         className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Stock</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Stock *</label>
                       <input
                         type="number"
                         value={product.inStock}
-                        onChange={(e) => setProduct({ ...product, inStock: Number(e.target.value) })}
+                        onChange={(e) => setProduct({ ...product, inStock: Number(e.target.value) || 0 })}
+                        min="0"
                         className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -391,6 +487,87 @@ const AddNewProduct = () => {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* Discount Ranges */}
+                <div>
+                  <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                    Discount 
+                  </h3>
+                  <div className="flex flex-wrap gap-4 mb-4">
+                    <input
+                      type="number"
+                      placeholder="Min Qty"
+                      value={newDiscount.minQuantity || ""}
+                      onChange={(e) =>
+                        setNewDiscount({ ...newDiscount, minQuantity: Number(e.target.value) || 0 })
+                      }
+                      min="1"
+                      className="px-4 py-2 border rounded-lg w-24 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max Qty"
+                      value={newDiscount.maxQuantity || ""}
+                      onChange={(e) =>
+                        setNewDiscount({ ...newDiscount, maxQuantity: Number(e.target.value) || 0 })
+                      }
+                      min="1"
+                      className="px-4 py-2 border rounded-lg w-24 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Discount %"
+                      value={newDiscount.discountPercent || ""}
+                      onChange={(e) =>
+                        setNewDiscount({ ...newDiscount, discountPercent: Number(e.target.value) || 0 })
+                      }
+                      min="1"
+                      max="100"
+                      className="px-4 py-2 border rounded-lg w-32 focus:ring-2 focus:ring-blue-500"
+                    />
+                    <button
+                      onClick={addDiscountRange}
+                      type="button"
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {discountRanges.length > 0 ? (
+                    <div className="overflow-x-auto border rounded-lg">
+                      <table className="w-full text-sm text-left">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th className="px-4 py-2">Min Qty</th>
+                            <th className="px-4 py-2">Max Qty</th>
+                            <th className="px-4 py-2">Discount %</th>
+                            <th className="px-4 py-2 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {discountRanges.map((d, i) => (
+                            <tr key={i} className="border-t">
+                              <td className="px-4 py-2">{d.minQuantity}</td>
+                              <td className="px-4 py-2">{d.maxQuantity}</td>
+                              <td className="px-4 py-2">{d.discountPercent}%</td>
+                              <td className="px-4 py-2 text-right">
+                                <button
+                                  onClick={() => removeDiscount(i)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  Remove
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500">No discount ranges added</p>
+                  )}
                 </div>
 
                 {/* Media Upload */}
@@ -409,9 +586,11 @@ const AddNewProduct = () => {
                     </p>
                   )}
                 </div>
+
+                
               </div>
 
-              {/* Right: Sidebar */}
+              {/* Right Sidebar */}
               <div className="space-y-6">
                 <div className="bg-gray-50 p-6 rounded-lg">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -432,17 +611,29 @@ const AddNewProduct = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Merchant *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Merchant *
+                      </label>
                       <select
                         value={product.merchantId}
                         onChange={(e) => setProduct({ ...product, merchantId: e.target.value })}
                         className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        disabled={merchants.length === 0}
                       >
-                        <option value="">Select merchant</option>
+                        <option value="">
+                          {merchants.length === 0 ? "No merchants available" : "Select merchant"}
+                        </option>
                         {merchants.map((m) => (
-                          <option key={m.id} value={m.id}>{m.name}</option>
+                          <option key={m.id} value={m.id}>
+                            {m.name}
+                          </option>
                         ))}
                       </select>
+                      {merchants.length === 0 && (
+                        <p className="text-xs text-amber-600 mt-2">
+                          Contact super admin to assign merchants
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
