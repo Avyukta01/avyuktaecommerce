@@ -103,54 +103,58 @@ const Header = () => {
                 </svg>
               </button>
 
-              {showDropdown && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50">
-                  {!session ? (
-                    <>
-                      <Link
-                        href="/login"
-                        className="flex items-center px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <FaUser className="mr-3" /> Login
-                      </Link>
-                      <Link
-                        href="/register"
-                        className="flex items-center px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <FaUser className="mr-3" /> Register
-                      </Link>
-                    </>
-                  ) : (
-                    <>
-                      <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">
-                          {session.user?.email}
-                        </p>
-                        <p className="text-xs text-gray-500">Signed in</p>
-                      </div>
-                      <Link
-                        href="/profile"
-                        className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-700 transition-colors"
-                        onClick={() => setShowDropdown(false)}
-                      >
-                        <FaUser className="mr-3" /> Profile
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setShowDropdown(false);
-                          toast.success("Logout successful!");
-                          setTimeout(() => signOut(), 1000);
-                        }}
-                        className="flex items-center w-full text-left px-4 py-3 hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors"
-                      >
-                        <FaUser className="mr-3" /> Logout
-                      </button>
-                    </>
-                  )}
-                </div>
-              )}
+  {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50">
+      {!session ? (
+        <>
+          <Link
+            href="/login"
+                          className="flex items-center px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+            onClick={() => setShowDropdown(false)}
+          >
+                          <FaUser className="mr-3" />
+            SignIn
+          </Link>
+          <Link
+            href="/register"
+                          className="flex items-center px-4 py-3 hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+            onClick={() => setShowDropdown(false)}
+          >
+                          <FaUser className="mr-3" />
+            SignUp
+          </Link>
+        </>
+      ) : (
+        <>
+                        <div className="px-4 py-3 border-b border-gray-100">
+                          <p className="text-sm font-medium text-gray-900">{session.user?.email}</p>
+                          <p className="text-xs text-gray-500">Signed in</p>
+                        </div>
+                        <Link
+                          href="/profile"
+                          className="flex items-center px-4 py-3 hover:bg-gray-50 text-gray-700 transition-colors"
+                          onClick={() => setShowDropdown(false)}
+                        >
+                          <FaUser className="mr-3" />
+                          Profile
+                        </Link>
+          <button
+            onClick={() => {
+              setShowDropdown(false);
+              toast.success("Logout successful!");
+              setTimeout(() => signOut(), 1000);
+            }}
+                          className="flex items-center w-full text-left px-4 py-3 hover:bg-red-50 text-gray-700 hover:text-red-600 transition-colors"
+          >
+                          <FaUser className="mr-3" />
+            Logout
+          </button>
+        </>
+      )}
+    </div>
+  )}
+</div>
+
             </div>
           </div>
         </div>
@@ -161,7 +165,7 @@ const Header = () => {
             <SearchInput />
           </div>
         )}
-      </div>
+      
     </header>
   );
 };

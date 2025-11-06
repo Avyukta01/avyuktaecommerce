@@ -8,6 +8,8 @@ import { FaBagShopping } from "react-icons/fa6";
 import { FaStore } from "react-icons/fa6";
 import { MdCategory } from "react-icons/md";
 import { FaFileUpload } from "react-icons/fa";
+ import { FaFileAlt } from "react-icons/fa"; 
+ import { FaImage} from "react-icons/fa";
 
 
 import Link from "next/link";
@@ -150,39 +152,48 @@ const DashboardSidebar = () => {
                 ? "text-white" 
                 : "text-gray-500 group-hover:text-gray-700"
             }`} />
-            <span>Users</span>
+            <span>Buyers</span>
           </div>
         </Link>
 
-        {/* <Link href="/admin/merchant">
+ <Link href="/admin/website-images">
           <div className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${
-            pathname === "/admin/merchant" 
+            pathname === "/admin/website-images" 
               ? "bg-blue-600 text-white shadow-sm" 
               : "text-gray-700 hover:bg-gray-100"
           }`}>
-            <FaStore className={`text-lg transition-colors ${
-              pathname === "/admin/merchant" 
+            <FaImage className={`text-lg transition-colors ${
+              pathname === "/admin/website-images" 
                 ? "text-white" 
                 : "text-gray-500 group-hover:text-gray-700"
             }`} />
-            <span>Merchant</span>
+            <span>Banners</span>
           </div>
-        </Link> */}
+        </Link>
+      
 
-        {/* <Link href="/admin/settings">
-          <div className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${
-            pathname === "/admin/settings" 
-              ? "bg-blue-600 text-white shadow-sm" 
-              : "text-gray-700 hover:bg-gray-100"
-          }`}>
-            <FaGear className={`text-lg transition-colors ${
-              pathname === "/admin/settings" 
-                ? "text-white" 
-                : "text-gray-500 group-hover:text-gray-700"
-            }`} />
-            <span>Settings</span>
-          </div>
-        </Link> */}
+{/* ...inside your sidebar list... */}
+<Link href="/admin/terms">
+  <div
+    className={`flex gap-x-3 w-full cursor-pointer items-center py-3 px-3 text-sm font-medium transition-all duration-200 group relative rounded-lg mb-1 ${
+      pathname === "/admin/terms"
+        ? "bg-blue-600 text-white shadow-sm"
+        : "text-gray-700 hover:bg-gray-100"
+    }`}
+  >
+    <FaFileAlt
+      className={`text-lg transition-colors ${
+        pathname === "/admin/terms"
+          ? "text-white"
+          : "text-gray-500 group-hover:text-gray-700"
+      }`}
+    />
+    <span>Generic Terms</span>
+  </div>
+</Link>
+
+       
+        
       </div>
 
       {/* Modern Footer */}

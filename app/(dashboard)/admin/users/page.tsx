@@ -1,18 +1,11 @@
 "use client";
 
 import { CustomButton } from "@/components";
-
 import apiClient from "@/lib/api";
 import { nanoid } from "nanoid";
 import Link from "next/link";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Home, People } from "@mui/icons-material";
-
-interface User {
-  id: number;
-  email: string;
-  role: string;
-}
 
 interface User {
   id: number;
@@ -27,16 +20,24 @@ const DashboardUsers = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
+  // ✅ Load only users (exclude admin/superadmin)
   useEffect(() => {
-    apiClient.get("/api/users")
+    apiClient
+      .get("/api/users")
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch users");
-        }
+        if (!res.ok) throw new Error("Failed to fetch users");
         return res.json();
       })
       .then((data) => {
-        setUsers(data);
+        // ✅ Filter only regular users
+        const onlyUsers = Array.isArray(data)
+          ? data.filter(
+              (user: User) =>
+                user.role?.toLowerCase() === "user" ||
+                user.role?.toLowerCase() === "customer"
+            )
+          : [];
+        setUsers(onlyUsers);
       })
       .catch((err) => {
         console.error("Error fetching users:", err);
@@ -50,14 +51,22 @@ const DashboardUsers = () => {
     setCurrentPage(1);
   }, []);
 
+  // ✅ Apply both "role filter" and "search"
   const filteredUsers = useMemo(() => {
     if (!users) return [];
-    if (!searchTerm) return users;
-    
-    return users.filter((user) =>
-      user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user?.role?.toLowerCase().includes(searchTerm.toLowerCase())
+    let visibleUsers = users.filter(
+      (u) => u.role?.toLowerCase() === "user" || u.role?.toLowerCase() === "customer"
     );
+
+    if (searchTerm) {
+      visibleUsers = visibleUsers.filter(
+        (user) =>
+          user?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          user?.role?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return visibleUsers;
   }, [users, searchTerm]);
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -67,13 +76,15 @@ const DashboardUsers = () => {
 
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  // CSV Download
+  // CSV Download (only visible users)
   const handleDownload = () => {
     const headers = "ID,Email,Role\n";
     const rows = filteredUsers
       .map((u) => `${u.id},"${u.email}","${u.role}"`)
       .join("\n");
-    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      encodeURIComponent(headers + rows);
 
     const link = document.createElement("a");
     link.href = csvContent;
@@ -81,18 +92,28 @@ const DashboardUsers = () => {
     link.click();
   };
 
-  // Refresh Handler
+  // Refresh Handler (maintains filter)
   const handleRefresh = () => {
     setIsLoading(true);
-    apiClient.get("/api/users")
+    apiClient
+      .get("/api/users")
       .then((res) => res.json())
-      .then((data) => setUsers(data))
+      .then((data) => {
+        const onlyUsers = Array.isArray(data)
+          ? data.filter(
+              (user: User) =>
+                user.role?.toLowerCase() === "user" ||
+                user.role?.toLowerCase() === "customer"
+            )
+          : [];
+        setUsers(onlyUsers);
+      })
       .catch((err) => console.error("Error fetching users:", err))
       .finally(() => setIsLoading(false));
   };
 
   return (
-    <div className="xl:ml-5 w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
+    <div className="xl:w-full bg-white shadow-lg rounded-lg p-6 border border-gray-200">
       <div className="pb-6 pt-4 border-b-2 border-gray-200 mb-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">All Users</h1>
       </div>
@@ -124,24 +145,20 @@ const DashboardUsers = () => {
             value={searchTerm}
             onChange={handleSearch}
           />
-          <Link href="/admin/users/new">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-              </svg>
-              Add User
-            </button>
-          </Link>
+          
           <button
             onClick={handleDownload}
             className="px-4 py-2 bg-emerald-600 text-white rounded-md text-sm font-medium hover:bg-emerald-700 active:scale-95 transition-all shadow-sm hover:shadow-md flex items-center gap-2"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+              <path
+                fillRule="evenodd"
+                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
             </svg>
-            Download
+            Export
           </button>
-          
         </div>
       </div>
 
@@ -153,25 +170,11 @@ const DashboardUsers = () => {
               <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
                 <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
               </th>
-              <th
-                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  Email
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                  </svg>
-                </div>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
+                Email
               </th>
-              <th
-                className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500 cursor-pointer hover:bg-blue-800 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  Role
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
-                  </svg>
-                </div>
+              <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider border-r border-blue-500">
+                Role
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                 Actions
@@ -207,11 +210,13 @@ const DashboardUsers = () => {
                     {user?.email}
                   </td>
                   <td className="px-6 py-4 border-r border-gray-200 text-sm">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
-                      user.role === "admin" 
-                        ? "bg-purple-100 text-purple-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
+                        user.role === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
                       {user?.role}
                     </span>
                   </td>

@@ -1,17 +1,7 @@
-// *********************
-// Role of the component: Bulk upload products page for admin dashboard
-// Name of the component: BulkUpload.tsx
-// Developer: Aleksandar Kuzmanovic (modified)
-// Version: 1.0
-// Component call: <BulkUpload />
-// Input parameters: no input parameters
-// Output: bulk upload page for admin dashboard
-// *********************
-
 "use client";
 
 import { DashboardSidebar } from "@/components";
-
+import apiClient from "@/lib/api";
 import BulkUploadHistory from "@/components/BulkUploadHistory";
 import React, { useState, useRef } from "react";
 import toast from "react-hot-toast";
@@ -23,7 +13,6 @@ import {
 } from "react-icons/fa";
 
 import { Home, CloudUpload } from "@mui/icons-material";
-
 
 interface UploadResult {
   success: boolean;
@@ -100,11 +89,7 @@ const BulkUploadPage = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("http://localhost:3001/api/bulk-upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const response = await apiClient.post("/api/bulk-upload", formData);
       const data = await response.json();
 
       if (response.ok) {
@@ -138,10 +123,11 @@ const BulkUploadPage = () => {
     }
   };
 
+  //  Updated Template: categoryId → categoryName
   const downloadTemplate = () => {
-    const csvContent = `title,price,manufacturer,inStock,mainImage,description,slug,categoryId
-Sample Product,99.99,Sample Manufacturer,10,https://example.com/image.jpg,Sample description,sample-product,category-uuid
-Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Another description,another-product,category-uuid`;
+    const csvContent = `title,price,manufacturer,inStock,mainImage,description,slug,categoryName
+Sample Product,99.99,Sample Manufacturer,10,https://example.com/image.jpg,Sample description,sample-product,Electronics
+Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Another description,another-product,Fashion`;
 
     const blob = new Blob([csvContent], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -156,23 +142,21 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
   };
 
   return (
-  
     <div className="flex xl:flex-row flex-col justify-start items-start">
       <DashboardSidebar />
       <div className="w-full xl:p-14 p-4">
         <h1 className="text-4xl font-bold mb-8">Bulk Upload Products</h1>
 
-
         {/* Instructions */}
         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
           <h2 className="text-lg font-semibold mb-2 text-blue-800">
-            📋 Instructions
+             Instructions
           </h2>
           <ul className="list-disc list-inside space-y-1 text-sm text-blue-700">
             <li>Download the CSV template below</li>
             <li>
               Fill in your product data (title, price, manufacturer, stock,
-              image URL, description, slug, categoryId)
+              image URL, description, slug, categoryName)
             </li>
             <li>Upload the completed CSV file</li>
             <li>Maximum file size: 5MB</li>
@@ -294,8 +278,8 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   }`}
                 >
                   {uploadResult.success
-                    ? "✅ Upload Successful!"
-                    : "❌ Upload Failed"}
+                    ? " Upload Successful!"
+                    : " Upload Failed"}
                 </h3>
                 <p
                   className={`mb-3 ${
@@ -340,10 +324,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                               <li key={index}>{error}</li>
                             ))}
                           </ul>
-
-                        </div>    
-
-
+                        </div>
                       )}
                   </div>
                 )}
@@ -352,9 +333,9 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
           </div>
         )}
 
-        {/* CSV Format Guide */}
+        {/*  CSV Format Guide (Updated categoryName) */}
         <div className="mt-8 bg-gray-50 rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">📝 CSV Format Guide</h2>
+          <h2 className="text-2xl font-bold mb-4"> CSV Format Guide</h2>
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-300 text-sm">
               <thead>
@@ -378,7 +359,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     title
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
                   <td className="border border-gray-300 px-4 py-2">String</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Product name
@@ -388,7 +369,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     price
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
                   <td className="border border-gray-300 px-4 py-2">Number</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Product price (e.g., 99.99)
@@ -398,7 +379,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     manufacturer
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
                   <td className="border border-gray-300 px-4 py-2">String</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Manufacturer/Brand name
@@ -408,7 +389,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     inStock
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">❌ No</td>
+                  <td className="border border-gray-300 px-4 py-2"> No</td>
                   <td className="border border-gray-300 px-4 py-2">Number</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Stock quantity (default: 0)
@@ -418,7 +399,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     mainImage
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">❌ No</td>
+                  <td className="border border-gray-300 px-4 py-2"> No</td>
                   <td className="border border-gray-300 px-4 py-2">URL</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Product image URL
@@ -428,7 +409,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     description
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
                   <td className="border border-gray-300 px-4 py-2">String</td>
                   <td className="border border-gray-300 px-4 py-2">
                     Product description
@@ -438,7 +419,7 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                   <td className="border border-gray-300 px-4 py-2 font-mono">
                     slug
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
                   <td className="border border-gray-300 px-4 py-2">String</td>
                   <td className="border border-gray-300 px-4 py-2">
                     URL-friendly identifier
@@ -446,12 +427,12 @@ Another Product,149.99,Another Manufacturer,5,https://example.com/image2.jpg,Ano
                 </tr>
                 <tr>
                   <td className="border border-gray-300 px-4 py-2 font-mono">
-                    categoryId
+                    categoryName
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">✅ Yes</td>
-                  <td className="border border-gray-300 px-4 py-2">UUID</td>
+                  <td className="border border-gray-300 px-4 py-2"> Yes</td>
+                  <td className="border border-gray-300 px-4 py-2">String</td>
                   <td className="border border-gray-300 px-4 py-2">
-                    Category ID from database
+                    Category name (e.g., Electronics, Fashion)
                   </td>
                 </tr>
               </tbody>

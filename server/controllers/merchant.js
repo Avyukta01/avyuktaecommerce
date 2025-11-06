@@ -59,6 +59,23 @@ async function createMerchant(request, response) {
       return response.status(400).json({ error: "Merchant name is required" });
     }
 
+    if (email && phone) {
+      const existingMerchant = await prisma.merchant.findFirst({
+        where: {
+          OR: [
+            email ? { email: email.trim() } : {},
+            phone ? { phone: phone.trim() } : {},
+          ],
+        },
+      });
+
+      if (existingMerchant) {
+        return response.status(400).json({
+          error: "Merchant with this email or phone already exists",
+        });
+      }
+    }
+
     const merchant = await prisma.merchant.create({
       data: {
         name: name.trim(),

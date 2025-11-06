@@ -33,6 +33,7 @@ model category {
   updatedAt DateTime @default(now()) @updatedAt
 
   product product[]
+  bulk_upload_items   bulk_upload_item[] 
 }
 
 /**
@@ -76,6 +77,7 @@ model merchant {
 
   product        product[]
   adminMerchants admin_merchant[]
+  bulk_upload_batches bulk_upload_batch[]
 }
 
 /**
@@ -125,7 +127,8 @@ model product {
   wishlist       wishlist[]
   images         image[]
   videos         product_video[]
-  discounts      product_discount[]        // ✅ added relation for discount
+  discounts      product_discount[]
+  bulk_upload_items bulk_upload_item[]         // ✅ added relation for discount
 
   @@index([categoryId])
   @@index([merchantId])
@@ -177,6 +180,7 @@ model user {
   wishlist       wishlist[]
   wallet         wallet?
   adminMerchants admin_merchant[]
+   bulk_upload_batches bulk_upload_batch[] 
 }
 
 /**
@@ -302,4 +306,85 @@ model product_discount {
 
   @@index([productId])
   @@index([minQuantity, maxQuantity])
+}
+
+model GenericTerm {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WebsiteImage {
+  id          String   @id @default(cuid())
+  imageUrl    String
+  sectionType String   // "hero" | "middle" | "bottom"
+  title       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+
+/**
+ * ----------------------------- Bulk Upload Batch -----------------------------
+ * Each uploaded CSV file = one batch
+ */
+model bulk_upload_batch {
+  id          String              @id @default(uuid())
+  fileName    String
+  status      String              @default("PENDING") // PENDING | COMPLETED | PARTIAL | FAILED
+  itemCount   Int                 @default(0)
+  errorCount  Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @default(now()) @updatedAt
+
+  // Who uploaded this batch (user/admin)
+  uploadedById String?
+  uploadedBy   user?              @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  // Optional: link to merchant (if batches are merchant-specific)
+  merchantId String?
+  merchant   merchant?            @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+
+  // Relations
+  items bulk_upload_item[]
+
+  @@index([status])
+  @@index([merchantId])
+  @@index([uploadedById])
+}
+
+/**
+ * ----------------------------- Bulk Upload Item -----------------------------
+ * Each product row from CSV = one item
+ */
+model bulk_upload_item {
+  id           String     @id @default(uuid())
+  batchId      String
+  productId    String?
+  categoryId   String?
+  title        String
+  slug         String
+  price        Float
+  manufacturer String?
+  description  String?
+  mainImage    String?
+  inStock      Int        @default(0)
+  status       String     @default("PENDING") // PENDING | CREATED | ERROR | UPDATED
+  error        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @default(now()) @updatedAt
+
+  // Relations
+  batch    bulk_upload_batch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  product  product?           @relation(fields: [productId], references: [id], onDelete: SetNull)
+  category category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([batchId])
+  @@index([categoryId])
+  @@index([productId])
+  @@index([status])
 }

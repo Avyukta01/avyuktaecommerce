@@ -1,5 +1,10 @@
-const prisma = require("../utills/db");
+
+
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+
 const { asyncHandler, AppError } = require("../utills/errorHandler");
+
 const {
   parseCsvBufferToRows,
   validateRow,
@@ -10,23 +15,20 @@ const {
   applyItemUpdates,
 } = require("../services/bulkUploadService");
 
-// POST /api/bulk-upload
+
 const uploadCsvAndCreateBatch = asyncHandler(async (req, res) => {
-  console.log("📦 Bulk upload request received");
-  console.log("Files:", req.files);
-  console.log("Body:", req.body);
-  console.log("Headers:", req.headers);
+  
 
   const csvFile = req.files?.file;
   if (!csvFile) {
-    console.log("❌ No file uploaded");
+    
     throw new AppError("CSV file is required (field name: 'file')", 400);
   }
 
-  console.log("✅ File received:", csvFile.name, csvFile.size, "bytes");
+ 
 
   const rows = await parseCsvBufferToRows(csvFile.data);
-  console.log("📊 Parsed rows:", rows.length);
+
 
   if (!rows || rows.length === 0) {
     throw new AppError("CSV has no rows", 400);
@@ -40,18 +42,21 @@ const uploadCsvAndCreateBatch = asyncHandler(async (req, res) => {
     else errors.push({ index: i + 1, error });
   }
 
-  console.log("✅ Valid rows:", valid.length);
-  console.log("❌ Invalid rows:", errors.length);
 
+
+  //  Use transaction for consistency
   const result = await prisma.$transaction(async (tx) => {
+    // Create batch record
     const createdBatch = await tx.bulk_upload_batch.create({
       data: {
         fileName: csvFile.name,
         status: "PENDING",
         itemCount: rows.length,
         errorCount: errors.length,
+        uploadedById: req.user?.id || null,
       },
     });
+
 
     const { successCount, errorCount } = await createBatchWithItems(
       tx,
@@ -61,7 +66,8 @@ const uploadCsvAndCreateBatch = asyncHandler(async (req, res) => {
     );
 
     const finalStatus = computeBatchStatus(successCount, errorCount);
-    const batch = await tx.bulk_upload_batch.update({
+
+    const updatedBatch = await tx.bulk_upload_batch.update({
       where: { id: createdBatch.id },
       data: {
         status: finalStatus,
@@ -70,26 +76,31 @@ const uploadCsvAndCreateBatch = asyncHandler(async (req, res) => {
       },
     });
 
-    return batch;
+    
+    return updatedBatch;
   });
 
   const summary = await getBatchSummary(prisma, result.id);
 
   return res.status(201).json({
     batchId: result.id,
+    fileName: result.fileName,
     status: result.status,
+    message: "Bulk upload completed successfully!",
     ...summary,
-    validationErrors: errors,
+    validationErrors: errors.length > 0 ? errors : undefined,
   });
 });
 
+// -----------------------------------------------------------------------------
 // GET /api/bulk-upload
+// List all batches with details
+// -----------------------------------------------------------------------------
 const listBatches = asyncHandler(async (req, res) => {
   const batches = await prisma.bulk_upload_batch.findMany({
     orderBy: { createdAt: "desc" },
   });
 
-  // Get details for each batch
   const batchesWithDetails = await Promise.all(
     batches.map(async (batch) => {
       const items = await prisma.bulk_upload_item.findMany({
@@ -99,11 +110,11 @@ const listBatches = asyncHandler(async (req, res) => {
       const successfulRecords = items.filter(
         (item) => item.status === "CREATED" && item.productId !== null
       ).length;
+
       const failedRecords = items.filter(
         (item) => item.status === "ERROR" || item.error !== null
       ).length;
 
-      // Collect error messages
       const errors = items
         .filter((item) => item.error)
         .map((item) => item.error);
@@ -115,7 +126,7 @@ const listBatches = asyncHandler(async (req, res) => {
         successfulRecords,
         failedRecords,
         status: batch.status,
-        uploadedBy: "Admin", // You can get this from session if needed
+        uploadedBy: "Admin",
         uploadedAt: batch.createdAt,
         errors: errors.length > 0 ? errors : undefined,
       };
@@ -125,7 +136,10 @@ const listBatches = asyncHandler(async (req, res) => {
   return res.json({ batches: batchesWithDetails });
 });
 
+// -----------------------------------------------------------------------------
 // GET /api/bulk-upload/:batchId
+// Fetch a single batch with all uploaded items
+// -----------------------------------------------------------------------------
 const getBatchDetail = asyncHandler(async (req, res) => {
   const { batchId } = req.params;
   if (!batchId) throw new AppError("Batch ID is required", 400);
@@ -143,7 +157,10 @@ const getBatchDetail = asyncHandler(async (req, res) => {
   return res.json({ batch, items });
 });
 
+// -----------------------------------------------------------------------------
 // PUT /api/bulk-upload/:batchId
+// Update batch items (price, stock)
+// -----------------------------------------------------------------------------
 const updateBatchItems = asyncHandler(async (req, res) => {
   const { batchId } = req.params;
   const { items } = req.body;
@@ -160,31 +177,27 @@ const updateBatchItems = asyncHandler(async (req, res) => {
   return res.json({ updatedCount: updated.length, items: updated });
 });
 
+// -----------------------------------------------------------------------------
 // DELETE /api/bulk-upload/:batchId?deleteProducts=true/false
+// -----------------------------------------------------------------------------
 const deleteBatch = asyncHandler(async (req, res) => {
   const { batchId } = req.params;
   const deleteProducts = req.query.deleteProducts === "true";
 
   if (!batchId) throw new AppError("Batch ID is required", 400);
 
-  console.log(
-    `🗑️ Deleting batch ${batchId}, deleteProducts: ${deleteProducts}`
-  );
+  
 
-  // Check if batch exists
   const batch = await prisma.bulk_upload_batch.findUnique({
     where: { id: batchId },
   });
 
-  if (!batch) {
-    throw new AppError("Batch not found", 404);
-  }
+  if (!batch) throw new AppError("Batch not found", 404);
 
   if (deleteProducts) {
-    // Check if products can be deleted (not in orders)
-    console.log("🔍 Checking if products can be deleted...");
+   
     const check = await canDeleteProductsForBatch(prisma, batchId);
-    console.log("Check result:", check);
+    
 
     if (!check.canDelete) {
       const errorMsg =
@@ -197,7 +210,7 @@ const deleteBatch = asyncHandler(async (req, res) => {
       throw new AppError(errorMsg, 409);
     }
 
-    // Delete batch + items + products
+    // Delete batch, items, and products
     await prisma.$transaction(async (tx) => {
       const items = await tx.bulk_upload_item.findMany({
         where: { batchId, productId: { not: null } },
@@ -205,52 +218,45 @@ const deleteBatch = asyncHandler(async (req, res) => {
       });
 
       const productIds = items.map((i) => i.productId).filter(Boolean);
-      console.log(`🗑️ Deleting ${productIds.length} products`);
+      
 
       if (productIds.length > 0) {
-        // Delete products
         const deletedProducts = await tx.product.deleteMany({
           where: { id: { in: productIds } },
         });
-        console.log(`✅ Deleted ${deletedProducts.count} products`);
+     
       }
 
-      // Delete bulk_upload_items (cascade will handle this, but explicit is better)
       const deletedItems = await tx.bulk_upload_item.deleteMany({
         where: { batchId },
       });
-      console.log(`✅ Deleted ${deletedItems.count} items`);
+     
 
-      // Delete batch
-      await tx.bulk_upload_batch.delete({
-        where: { id: batchId },
-      });
-      console.log(`✅ Deleted batch`);
+      await tx.bulk_upload_batch.delete({ where: { id: batchId } });
+      
     });
 
-    console.log(`✅ Batch and products deleted successfully`);
+   
     return res.status(200).json({
       success: true,
       message: "Batch and products deleted successfully",
       deletedProducts: true,
     });
   } else {
-    // Delete batch + items only, keep products
+    // Delete batch + items only
     await prisma.$transaction(async (tx) => {
-      // Delete items
       const deletedItems = await tx.bulk_upload_item.deleteMany({
         where: { batchId },
       });
-      console.log(`✅ Deleted ${deletedItems.count} items`);
+      
 
-      // Delete batch
       await tx.bulk_upload_batch.delete({
         where: { id: batchId },
       });
-      console.log(`✅ Deleted batch`);
+   
     });
 
-    console.log(`✅ Batch deleted (products kept)`);
+    
     return res.status(200).json({
       success: true,
       message: "Batch deleted successfully (products kept)",
@@ -259,6 +265,9 @@ const deleteBatch = asyncHandler(async (req, res) => {
   }
 });
 
+// -----------------------------------------------------------------------------
+// Export Controller
+// -----------------------------------------------------------------------------
 module.exports = {
   uploadCsvAndCreateBatch,
   listBatches,

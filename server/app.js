@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 require("dotenv").config({ path: path.join(__dirname, ".env") });
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") });
+const fileUpload = require("express-fileupload");
 const bcrypt = require("bcryptjs");
 const productsRouter = require("./routes/products");
 const productImagesRouter = require("./routes/productImages");
@@ -15,12 +16,16 @@ const orderProductRouter = require("./routes/customer_order_product");
 const wishlistRouter = require("./routes/wishlist");
 const notificationsRouter = require("./routes/notifications");
 const merchantRouter = require("./routes/merchant");
-const adminRouter = require("./routes/admin");
+
 const bulkUploadRouter = require("./routes/bulkUpload");
 const walletRouter = require("./routes/wallet");
 const cors = require("cors");
 const productVideoRoutes = require("./routes/productVideos");
 const adminMerchantRoute = require("./routes/adminMerchantRoute");
+const adminGenericTermsRoute = require("./routes/adminGenericTermsRoute");
+const adminWebsiteImageRoute = require("./routes/adminWebsiteImageRoute");
+const adminRouter = require("./routes/admin");
+
 
 
 
@@ -92,6 +97,14 @@ app.use(cors(corsOptions));
 // ✅ Allow JSON payloads
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  fileUpload({
+    useTempFiles: false,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    abortOnLimit: true,
+    responseOnLimit: "File too large",
+  })
+);
 
 // ✅ Serve all files from /public folder
 app.use(express.static(path.join(__dirname, "public"))); // 🔥 This line enables /public image access
@@ -125,11 +138,15 @@ app.use("/api/wishlist", wishlistRouter);
 app.use("/api/notifications", notificationsRouter);
 app.use("/api/merchants", merchantRouter);
 app.use("/api/bulk-upload", bulkUploadRouter);
-app.use("/api/admin", adminRouter);
+
 app.use("/api/wallet", walletRouter);
 app.use("/api/productVideos", productVideoRoutes);
 app.use("/api/admin-merchants", adminMerchantRoute);
 app.use("/api/product-discounts", require("./routes/productDiscountRoute"));
+app.use("/api/admin/generic-terms", adminGenericTermsRoute);
+app.use("/api/admin/website-images", adminWebsiteImageRoute);
+app.use("/api/admin", adminRouter);
+
 
 
 

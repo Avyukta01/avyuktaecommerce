@@ -136,7 +136,7 @@ const AdminDashboardSidebar = () => {
                 ? "text-white" 
                 : "text-gray-500 group-hover:text-gray-700"
             }`} />
-            <span> ADD Customers</span>
+            <span> Add Customers</span>
           </div>
         </Link>
 

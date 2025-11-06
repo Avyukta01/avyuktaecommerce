@@ -1,6 +1,6 @@
 const { parse } = require("csv-parse/sync");
 
-// Validate a single CSV row according to the Product schema constraints
+// ✅ Validate a single CSV row according to the Product schema constraints
 function validateRow(row) {
   const errs = [];
   const clean = {};
@@ -8,14 +8,14 @@ function validateRow(row) {
   const title = String(row.title ?? "").trim();
   const slug = String(row.slug ?? "").trim();
   const price = Number(row.price);
-  const categoryId = String(row.categoryId ?? "").trim();
+  const categoryId = String(row.categoryId ?? row.categoryName ?? "").trim();
   const inStock = Number(row.inStock ?? 0);
 
   if (!title) errs.push("title is required");
   if (!slug) errs.push("slug is required");
   if (!Number.isFinite(price) || price < 0)
     errs.push("price must be a non-negative number");
-  if (!categoryId) errs.push("categoryId is required");
+  if (!categoryId) errs.push("category name or id is required");
   if (!Number.isFinite(inStock) || inStock < 0)
     errs.push("inStock must be a non-negative number");
 
@@ -24,7 +24,7 @@ function validateRow(row) {
   clean.title = title;
   clean.slug = slug;
   clean.price = Math.round(price * 100) / 100; // Keep 2 decimal places
-  clean.categoryId = categoryId;
+  clean.categoryId = categoryId; // store name or id
   clean.inStock = Math.floor(inStock); // Integer stock quantity
 
   clean.manufacturer = row.manufacturer
@@ -36,6 +36,7 @@ function validateRow(row) {
   return { ok: true, data: clean };
 }
 
+// ✅ Parse CSV buffer to JSON rows
 async function parseCsvBufferToRows(buffer) {
   const text = buffer.toString("utf-8");
   const records = parse(text, {
@@ -46,6 +47,7 @@ async function parseCsvBufferToRows(buffer) {
   return records;
 }
 
+// ✅ Compute final batch status
 function computeBatchStatus(successCount, errorCount) {
   if (successCount > 0 && errorCount === 0) return "COMPLETED";
   if (successCount > 0 && errorCount > 0) return "PARTIAL";
@@ -53,55 +55,72 @@ function computeBatchStatus(successCount, errorCount) {
   return "PENDING";
 }
 
-// Create products + items for valid rows, error items for invalid
+// ✅ Create products + items for valid rows, error items for invalid
 async function createBatchWithItems(tx, batchId, validRows, errorRows) {
-  const uniqueCategoryIds = [...new Set(validRows.map((r) => r.categoryId))];
+  const uniqueCategoryInputs = [
+    ...new Set(validRows.map((r) => r.categoryId.toLowerCase())),
+  ];
 
-  // Fetch categories by both ID and name (case-insensitive)
+  // Fetch categories by ID or name (case-insensitive)
   const categories = await tx.category.findMany({
     where: {
       OR: [
-        { id: { in: uniqueCategoryIds } },
-        { name: { in: uniqueCategoryIds } },
+        { id: { in: uniqueCategoryInputs } },
+        { name: { in: uniqueCategoryInputs } },
       ],
     },
     select: { id: true, name: true },
   });
 
-  // Create a map for both ID and name lookup
+  // Create lookup map
   const categoryMap = new Map();
   categories.forEach((cat) => {
-    categoryMap.set(cat.id, cat.id); // UUID -> UUID
-    categoryMap.set(cat.name.toLowerCase(), cat.id); // name -> UUID
+    categoryMap.set(cat.id.toLowerCase(), cat.id);
+    categoryMap.set(cat.name.toLowerCase(), cat.id);
   });
 
   let success = 0;
   let failed = 0;
 
-  for (const row of validRows) {
-    // Try to resolve categoryId (could be UUID or category name)
-    const resolvedCategoryId =
-      categoryMap.get(row.categoryId) ||
-      categoryMap.get(row.categoryId.toLowerCase());
+  // Get default merchant (required field)
+  const defaultMerchant = await tx.merchant.findFirst();
+  if (!defaultMerchant) {
+    throw new Error("No merchant found. Please create at least one merchant before bulk upload.");
+  }
 
+  for (const row of validRows) {
+    let lookupKey = row.categoryId.toLowerCase();
+    let resolvedCategoryId = categoryMap.get(lookupKey);
+
+    // ✅ Auto-create category if not found
     if (!resolvedCategoryId) {
-      await tx.bulk_upload_item.create({
-        data: {
-          batchId,
-          title: row.title,
-          slug: row.slug,
-          price: row.price,
-          manufacturer: row.manufacturer,
-          description: row.description,
-          mainImage: row.mainImage,
-          categoryId: row.categoryId,
-          inStock: row.inStock,
-          status: "ERROR",
-          error: `Category not found: ${row.categoryId}`,
-        },
-      });
-      failed++;
-      continue;
+      try {
+        const newCategory = await tx.category.create({
+          data: { name: row.categoryId },
+        });
+        resolvedCategoryId = newCategory.id;
+        categoryMap.set(row.categoryId.toLowerCase(), newCategory.id);
+        console.log(`🆕 Created new category: ${row.categoryId}`);
+      } catch (err) {
+        console.error("❌ Failed to create category:", err);
+        await tx.bulk_upload_item.create({
+          data: {
+            batchId,
+            title: row.title,
+            slug: row.slug,
+            price: row.price,
+            manufacturer: row.manufacturer,
+            description: row.description,
+            mainImage: row.mainImage,
+            categoryId: null,
+            inStock: row.inStock,
+            status: "ERROR",
+            error: `Failed to create category: ${row.categoryId}`,
+          },
+        });
+        failed++;
+        continue;
+      }
     }
 
     try {
@@ -109,12 +128,13 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
         data: {
           title: row.title,
           slug: row.slug,
-          price: row.price,
+          price: Math.round(row.price),
           rating: 5,
           description: row.description ?? "",
           manufacturer: row.manufacturer ?? "",
           mainImage: row.mainImage ?? "",
-          categoryId: resolvedCategoryId, // Use resolved category ID
+          categoryId: resolvedCategoryId,
+          merchantId: defaultMerchant.id, // ✅ Required field fix
           inStock: row.inStock,
         },
       });
@@ -129,14 +149,17 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
           manufacturer: row.manufacturer,
           description: row.description,
           mainImage: row.mainImage,
-          categoryId: resolvedCategoryId, // Use resolved category ID
+          categoryId: resolvedCategoryId,
           inStock: row.inStock,
           status: "CREATED",
           error: null,
         },
       });
+
+      console.log(`✅ Created product: ${row.title}`);
       success++;
     } catch (e) {
+      console.error("❌ Prisma create product error:", e);
       await tx.bulk_upload_item.create({
         data: {
           batchId,
@@ -146,7 +169,7 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
           manufacturer: row.manufacturer,
           description: row.description,
           mainImage: row.mainImage,
-          categoryId: resolvedCategoryId || row.categoryId,
+          categoryId: resolvedCategoryId || null,
           inStock: row.inStock,
           status: "ERROR",
           error: e?.message || "Create failed",
@@ -156,6 +179,7 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
     }
   }
 
+  // Insert invalid rows
   for (const err of errorRows) {
     await tx.bulk_upload_item.create({
       data: {
@@ -166,7 +190,7 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
         manufacturer: null,
         description: null,
         mainImage: null,
-        categoryId: "",
+        categoryId: null,
         inStock: 0,
         status: "ERROR",
         error: `Row ${err.index}: ${err.error}`,
@@ -178,6 +202,7 @@ async function createBatchWithItems(tx, batchId, validRows, errorRows) {
   return { successCount: success, errorCount: failed };
 }
 
+// ✅ Batch summary helper
 async function getBatchSummary(prisma, batchId) {
   const total = await prisma.bulk_upload_item.count({ where: { batchId } });
   const errors = await prisma.bulk_upload_item.count({
@@ -192,6 +217,7 @@ async function getBatchSummary(prisma, batchId) {
   return { total, errors, created, updated };
 }
 
+// ✅ Check if products in orders before deletion
 async function canDeleteProductsForBatch(prisma, batchId) {
   const items = await prisma.bulk_upload_item.findMany({
     where: { batchId, productId: { not: null } },
@@ -222,8 +248,8 @@ async function canDeleteProductsForBatch(prisma, batchId) {
   return { canDelete: true, blockedProductIds: [] };
 }
 
+// ✅ Update items + linked products
 async function applyItemUpdates(tx, batchId, updates) {
-  // updates: [{ itemId, price, inStock }]
   const ids = updates.map((u) => u.itemId);
   const items = await tx.bulk_upload_item.findMany({
     where: { id: { in: ids }, batchId },

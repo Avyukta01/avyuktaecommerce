@@ -220,7 +220,7 @@ const LoginPage = () => {
                   </span>
                 </button>
 
-                <button
+                {/* <button
                   className="flex w-full items-center justify-center gap-3 rounded-md bg-[#24292F] px-3 py-1.5 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#24292F]"
                   onClick={() => {
                     signIn("github");
@@ -241,7 +241,7 @@ const LoginPage = () => {
                   <span className="text-sm font-semibold leading-6">
                     GitHub
                   </span>
-                </button>
+                </button> */}
               </div>
 
               <p className="text-red-600 text-center text-[16px] my-4">
