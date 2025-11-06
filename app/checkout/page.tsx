@@ -296,7 +296,7 @@ const CheckoutPage = () => {
       setIsSubmitting(false);
     }
   };
-
+  
   const addOrderProduct = async (
     orderId: string,
     productId: string,
@@ -377,7 +377,7 @@ const CheckoutPage = () => {
                     <p className="text-gray-500">x{product?.amount}</p>
                   </div>
                   <p className="flex-none text-base font-medium">
-                    ${product?.price}
+                    {product?.price}
                   </p>
                 </li>
               ))}
@@ -386,376 +386,332 @@ const CheckoutPage = () => {
             <dl className="hidden space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-gray-900 lg:block">
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Subtotal</dt>
-                <dd>${total}</dd>
+                <dd>{total}</dd>
               </div>
               <div className="flex items-center justify-between">
                 <dt className="text-gray-600">Shipping</dt>
-                <dd>$5</dd>
+                <dd>5</dd>
               </div>
               <div className="flex items-center justify-between">
-                <dt className="text-gray-600">Taxes</dt>
-                <dd>${total / 5}</dd>
+                <dt className="text-gray-600">Discount</dt>
+                <dd>{total / 5}</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-6">
                 <dt className="text-base">Total</dt>
                 <dd className="text-base">
-                  ${total === 0 ? 0 : Math.round(total + total / 5 + 5)}
+                  {total === 0 ? 0 : Math.round(total + total / 5 + 5)}
                 </dd>
               </div>
             </dl>
+
+ <div className="border-t pt-6 flex justify-end">
+      <button
+        type="button"
+        onClick={makePurchase}
+        disabled={isSubmitting}
+        className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-10 py-3 rounded-lg transition disabled:bg-gray-400"
+      >
+        {isSubmitting ? "Processing Order..." : "Place Order"}
+      </button>
+    </div>
+
           </div>
         </section>
 
-        <form className="px-4 pt-16 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0">
-          <div className="mx-auto max-w-lg lg:max-w-none">
-            {/* Contact Information */}
-            <section aria-labelledby="contact-info-heading">
-              <h2
-                id="contact-info-heading"
-                className="text-lg font-medium text-gray-900"
-              >
-                Contact information
-              </h2>
+        <form className="px-4 pt-10 sm:px-6 lg:col-start-1 lg:row-start-1 lg:px-0">
+  <div className="mx-auto max-w-lg lg:max-w-none space-y-10">
+    {/* 🧍 Contact Information */}
+    <section
+      aria-labelledby="contact-info-heading"
+      className="bg-white rounded-xl shadow p-6 border border-gray-100"
+    >
+      <h2
+        id="contact-info-heading"
+        className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2"
+      >
+        Contact Information
+      </h2>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="name-input"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Name * (min 2 characters)
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={checkoutForm.name}
-                    onChange={(e) =>
-                      setCheckoutForm({
-                        ...checkoutForm,
-                        name: e.target.value,
-                      })
-                    }
-                    type="text"
-                    id="name-input"
-                    name="name-input"
-                    autoComplete="given-name"
-                    required
-                    disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
+      {/* First Name */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div>
+          <label
+            htmlFor="name-input"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            First Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            value={checkoutForm.name}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, name: e.target.value })
+            }
+            type="text"
+            id="name-input"
+            name="name-input"
+            autoComplete="given-name"
+            required
+            disabled={isSubmitting}
+            placeholder="John"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="lastname-input"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Lastname * (min 2 characters)
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={checkoutForm.lastname}
-                    onChange={(e) =>
-                      setCheckoutForm({
-                        ...checkoutForm,
-                        lastname: e.target.value,
-                      })
-                    }
-                    type="text"
-                    id="lastname-input"
-                    name="lastname-input"
-                    autoComplete="family-name"
-                    required
-                    disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
+        {/* Last Name */}
+        <div>
+          <label
+            htmlFor="lastname-input"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Last Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            value={checkoutForm.lastname}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, lastname: e.target.value })
+            }
+            type="text"
+            id="lastname-input"
+            name="lastname-input"
+            autoComplete="family-name"
+            required
+            disabled={isSubmitting}
+            placeholder="Doe"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+      </div>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="phone-input"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Phone number * (min 10 digits)
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={checkoutForm.phone}
-                    onChange={(e) =>
-                      setCheckoutForm({
-                        ...checkoutForm,
-                        phone: e.target.value,
-                      })
-                    }
-                    type="tel"
-                    id="phone-input"
-                    name="phone-input"
-                    autoComplete="tel"
-                    required
-                    disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
+      {/* Phone + Email */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+        <div>
+          <label
+            htmlFor="phone-input"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Phone Number <span className="text-red-500">*</span>
+          </label>
+          <input
+            value={checkoutForm.phone}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, phone: e.target.value })
+            }
+            type="tel"
+            id="phone-input"
+            name="phone-input"
+            autoComplete="tel"
+            required
+            disabled={isSubmitting}
+            placeholder="e.g. 9876543210"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
 
-              <div className="mt-6">
-                <label
-                  htmlFor="email-address"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Email address *
-                </label>
-                <div className="mt-1">
-                  <input
-                    value={checkoutForm.email}
-                    onChange={(e) =>
-                      setCheckoutForm({
-                        ...checkoutForm,
-                        email: e.target.value,
-                      })
-                    }
-                    type="email"
-                    id="email-address"
-                    name="email-address"
-                    autoComplete="email"
-                    required
-                    disabled={isSubmitting}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                </div>
-              </div>
-            </section>
+        <div>
+          <label
+            htmlFor="email-address"
+            className="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Email Address <span className="text-red-500">*</span>
+          </label>
+          <input
+            value={checkoutForm.email}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, email: e.target.value })
+            }
+            type="email"
+            id="email-address"
+            name="email-address"
+            autoComplete="email"
+            required
+            disabled={isSubmitting}
+            placeholder="you@example.com"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          />
+        </div>
+      </div>
+    </section>
 
-            {/* Payment Notice */}
-            <section className="mt-10">
-              <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-blue-800">
-                      Payment Information
-                    </h3>
-                    <div className="mt-2 text-sm text-blue-700">
-                      <p>Payment will be processed after order confirmation. You will be contacted for payment details.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
+    {/* 💳 Payment Info */}
+    <section className="bg-blue-50 border border-blue-200 rounded-xl p-5 flex items-start gap-3">
+      <div className="p-2 bg-blue-100 rounded-full">
+        <svg
+          className="h-5 w-5 text-blue-500"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </div>
+      <div>
+        <h3 className="text-sm font-semibold text-blue-800">
+          Payment Information
+        </h3>
+        <p className="text-sm text-blue-700 mt-1">
+          Payment will be processed after order confirmation. You’ll be contacted
+          for details.
+        </p>
+      </div>
 
-            {/* Shipping Address */}
-            <section aria-labelledby="shipping-heading" className="mt-10">
-              <h2
-                id="shipping-heading"
-                className="text-lg font-medium text-gray-900"
-              >
-                Shipping address
-              </h2>
+    </section>
 
-              <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-3">
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="company"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Company *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="company"
-                      name="company"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.company}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          company: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+    {/* 📦 Shipping Address */}
+    <section
+      aria-labelledby="shipping-heading"
+      className="bg-white rounded-xl shadow p-6 border border-gray-100"
+    >
+      <h2
+        id="shipping-heading"
+        className="text-xl font-semibold text-gray-800 mb-5 border-b pb-2"
+      >
+        Shipping Address
+      </h2>
 
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="address"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Address *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="address"
-                      name="address"
-                      autoComplete="street-address"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.adress}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          adress: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        {/* Company */}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Company Name
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.company}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, company: e.target.value })
+            }
+            disabled={isSubmitting}
+            placeholder="Your company (optional)"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="apartment"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Apartment, suite, etc. * (required)
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="apartment"
-                      name="apartment"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.apartment}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          apartment: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+        {/* Address */}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Address <span className="text-red-500">*</span>
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.adress}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, adress: e.target.value })
+            }
+            disabled={isSubmitting}
+            placeholder="123 Main Street"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div>
-                  <label
-                    htmlFor="city"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    City *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="city"
-                      name="city"
-                      autoComplete="address-level2"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.city}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          city: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+        {/* Apartment */}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Apartment / Suite
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.apartment}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, apartment: e.target.value })
+            }
+            disabled={isSubmitting}
+            placeholder="Apt 3B"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div>
-                  <label
-                    htmlFor="region"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Country *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="region"
-                      name="region"
-                      autoComplete="address-level1"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.country}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          country: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+        {/* City */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            City
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.city}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, city: e.target.value })
+            }
+            disabled={isSubmitting}
+            placeholder="e.g. New Delhi"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div>
-                  <label
-                    htmlFor="postal-code"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Postal code *
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      id="postal-code"
-                      name="postal-code"
-                      autoComplete="postal-code"
-                      required
-                      disabled={isSubmitting}
-                      className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      value={checkoutForm.postalCode}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          postalCode: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+        {/* Country */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Country
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.country}
+            onChange={(e) =>
+              setCheckoutForm({ ...checkoutForm, country: e.target.value })
+            }
+            disabled={isSubmitting}
+            placeholder="e.g. India"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="order-notice"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Order notice
-                  </label>
-                  <div className="mt-1">
-                    <textarea
-                      className="textarea textarea-bordered textarea-lg w-full disabled:bg-gray-100 disabled:cursor-not-allowed"
-                      id="order-notice"
-                      name="order-notice"
-                      autoComplete="order-notice"
-                      disabled={isSubmitting}
-                      value={checkoutForm.orderNotice}
-                      onChange={(e) =>
-                        setCheckoutForm({
-                          ...checkoutForm,
-                          orderNotice: e.target.value,
-                        })
-                      }
-                    ></textarea>
-                  </div>
-                </div>
-              </div>
-            </section>
+        {/* Postal Code */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Postal Code
+          </label>
+          <input
+            type="text"
+            value={checkoutForm.postalCode}
+            onChange={(e) =>
+              setCheckoutForm({
+                ...checkoutForm,
+                postalCode: e.target.value,
+              })
+            }
+            disabled={isSubmitting}
+            placeholder="e.g. 110001"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-            <div className="mt-10 border-t border-gray-200 pt-6 ml-0">
-              <button
-                type="button"
-                onClick={makePurchase}
-                disabled={isSubmitting}
-                className="w-full rounded-md border border-transparent bg-blue-500 px-20 py-2 text-lg font-medium text-white shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-gray-50 sm:order-last disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Processing Order..." : "Place Order"}
-              </button>
-            </div>
-          </div>
-        </form>
+        {/* Order Note */}
+        <div className="sm:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Order Note
+          </label>
+          <textarea
+            value={checkoutForm.orderNotice}
+            onChange={(e) =>
+              setCheckoutForm({
+                ...checkoutForm,
+                orderNotice: e.target.value,
+              })
+            }
+            disabled={isSubmitting}
+            placeholder="Add delivery instructions or notes"
+            className="block w-full rounded-md border border-gray-300 p-2.5 text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500"
+          ></textarea>
+        </div>
+      </div>
+    </section>
+
+    {/* 🟡 Submit Button */}
+    <div className="border-t pt-6 flex justify-end">
+      <button
+        type="button"
+        onClick={makePurchase}
+        disabled={isSubmitting}
+        className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-10 py-3 rounded-lg transition disabled:bg-gray-400"
+      >
+        {isSubmitting ? "Processing Order..." : "Place Order"}
+      </button>
+    </div>
+  </div>
+</form>
+
       </main>
     </div>
   );

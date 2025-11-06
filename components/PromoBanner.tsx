@@ -121,7 +121,7 @@ const PromoBanner = () => {
                     : "left-4 sm:left-10"
                 } -z-1`}
               />
-
+                
               <div
                 className={
                   banner.textAlign === "left" ? "text-left" : "text-right"

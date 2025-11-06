@@ -1,13 +1,12 @@
-"use client"
+"use client";
 import { useWishlistStore } from "@/app/_zustand/wishlistStore";
 import WishItem from "@/components/WishItem";
 import apiClient from "@/lib/api";
-import { nanoid } from "nanoid";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export const WishlistModule = () => {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const { wishlist, setWishlist } = useWishlistStore();
 
   const getWishlistByUserId = async (id: string) => {
@@ -15,57 +14,51 @@ export const WishlistModule = () => {
       const response = await apiClient.get(`/api/wishlist/${id}`, {
         cache: "no-store",
       });
-      
-      if (!response.ok) {
-        throw new Error("Failed to fetch wishlist");
-      }
-      
-      const wishlist = await response.json();
 
-      const productArray: {
-        id: string;
-        title: string;
-        price: number;
-        image: string;
-        slug: string
-        stockAvailabillity: number;
-      }[] = [];
+      if (!response.ok) throw new Error("Failed to fetch wishlist");
 
-      wishlist.map((item: any) => productArray.push({ id: item?.product?.id, title: item?.product?.title, price: item?.product?.price, image: item?.product?.mainImage, slug: item?.product?.slug, stockAvailabillity: item?.product?.inStock }));
+      const wishlistData = await response.json();
+
+      const productArray = wishlistData.map((item: any) => ({
+        id: item?.product?.id,
+        title: item?.product?.title,
+        price: item?.product?.price,
+        image: item?.product?.mainImage,
+        slug: item?.product?.slug,
+        stockAvailabillity: item?.product?.inStock,
+      }));
 
       setWishlist(productArray);
     } catch (error) {
       console.error("Error fetching wishlist:", error);
-      setWishlist([]);
     }
   };
 
   const getUserByEmail = async () => {
-    if (session?.user?.email) {
-      try {
-        const response = await apiClient.get(`/api/users/email/${session?.user?.email}`, {
-          cache: "no-store",
-        });
-        
-        if (!response.ok) {
-          throw new Error("Failed to fetch user");
-        }
-        
-        const data = await response.json();
-        getWishlistByUserId(data?.id);
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
+    if (!session?.user?.email) return;
+
+    try {
+      const response = await apiClient.get(
+        `/api/users/email/${session.user.email}`,
+        { cache: "no-store" }
+      );
+
+      if (!response.ok) throw new Error("Failed to fetch user");
+
+      const user = await response.json();
+      if (user?.id) getWishlistByUserId(user.id);
+    } catch (error) {
+      console.error("Error fetching user:", error);
     }
   };
 
   useEffect(() => {
-    getUserByEmail();
-  }, [session?.user?.email, wishlist.length]);
+    if (session?.user?.email) getUserByEmail();
+  }, [session?.user?.email]); // ✅ no wishlist.length here
+
   return (
     <>
-
-      {wishlist && wishlist.length === 0 ? (
+      {wishlist.length === 0 ? (
         <h3 className="text-center text-4xl py-10 text-black max-lg:text-3xl max-sm:text-2xl max-sm:pt-5 max-[400px]:text-xl">
           No items found in the wishlist
         </h3>
@@ -83,23 +76,22 @@ export const WishlistModule = () => {
                 </tr>
               </thead>
               <tbody>
-                {wishlist &&
-                  wishlist?.map((item) => (
-                    <WishItem
-                      id={item?.id}
-                      title={item?.title}
-                      price={item?.price}
-                      image={item?.image}
-                      slug={item?.slug}
-                      stockAvailabillity={item?.stockAvailabillity}
-                      key={nanoid()}
-                    />
-                  ))}
+                {wishlist.map((item) => (
+                  <WishItem
+                    key={item.id}
+                    id={item.id}
+                    title={item.title}
+                    price={item.price}
+                    image={item.image}
+                    slug={item.slug}
+                    stockAvailabillity={item.stockAvailabillity}
+                  />
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       )}
     </>
-  )
-}
+  );
+};

@@ -1,45 +1,53 @@
-// *********************
-// Role of the component: Filters on shop page
-// Name of the component: Filters.tsx
-// Developer: Aleksandar Kuzmanovic
-// Version: 1.0
-// Component call: <Filters />
-// Input parameters: no input parameters
-// Output: stock, rating and price filter
-// *********************
-
 "use client";
 import React, { useEffect, useState } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSortStore } from "@/app/_zustand/sortStore";
 import { usePaginationStore } from "@/app/_zustand/paginationStore";
+import apiClient from "@/lib/api";
 
 interface InputCategory {
-  inStock: { text: string, isChecked: boolean },
-  outOfStock: { text: string, isChecked: boolean },
-  priceFilter: { text: string, value: number },
-  ratingFilter: { text: string, value: number },
+  inStock: { text: string; isChecked: boolean };
+  outOfStock: { text: string; isChecked: boolean };
+  priceFilter: { text: string; value: number };
+  ratingFilter: { text: string; value: number };
 }
 
 const Filters = () => {
   const pathname = usePathname();
   const { replace } = useRouter();
+    const router = useRouter();
 
-  // getting current page number from Zustand store
   const { page } = usePaginationStore();
+  const { sortBy } = useSortStore();
 
+  const [categories, setCategories] = useState<any[]>([]);
   const [inputCategory, setInputCategory] = useState<InputCategory>({
     inStock: { text: "instock", isChecked: true },
     outOfStock: { text: "outofstock", isChecked: true },
     priceFilter: { text: "price", value: 3000 },
     ratingFilter: { text: "rating", value: 0 },
   });
-  const { sortBy } = useSortStore();
 
+
+  // ✅ Fetch categories
+useEffect(() => {
+  const fetchCategories = async () => {
+    try {
+      const res = await apiClient.get("/api/categories"); // fetch wrapper
+      const data = await res.json(); // ✅ fetch me json parse karna padta hai
+      setCategories(data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  fetchCategories();
+}, []);
+
+
+  // ✅ Sync filters to URL
   useEffect(() => {
     const params = new URLSearchParams();
-    // setting URL params and after that putting them all in URL
     params.set("outOfStock", inputCategory.outOfStock.isChecked.toString());
     params.set("inStock", inputCategory.inStock.isChecked.toString());
     params.set("rating", inputCategory.ratingFilter.value.toString());
@@ -50,9 +58,36 @@ const Filters = () => {
   }, [inputCategory, sortBy, page]);
 
   return (
-<div className="w-60 h-screen sticky top-20 overflow-y-auto bg-white shadow-md p-3  rounded-lg">
+    <div className="w-60 h-screen sticky top-20 overflow-y-auto bg-white shadow-md p-3 rounded-lg">
+      {/* ✅ Categories Bar */}
+      <h3 className="text-2xl mb-2">Categories</h3>
+      <div className="divider"></div>
+     <div className="flex flex-wrap gap-2 justify-start overflow-x-auto scrollbar-hide pb-3">
+  {categories.length > 0 ? (
+    categories.map((cat) => (
+      <div
+        key={cat.id || cat._id}
+        onClick={() =>
+          router.push(`/shop?category=${encodeURIComponent(cat.slug || cat.name)}`)
+        } // ✅ added navigation
+        className="flex-shrink-0 border border-gray-200 bg-white px-3 py-1 rounded-md shadow-sm 
+                   text-gray-700 font-medium hover:bg-blue-50 hover:border-blue-400 hover:text-blue-600 
+                   cursor-pointer transition-all duration-200"
+      >
+        {cat.name || cat.title}
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-400 text-sm">Loading categories...</p>
+  )}
+</div>
+
+
+      {/* ✅ Filters Section */}
       <h3 className="text-2xl mb-2">Filters</h3>
       <div className="divider"></div>
+
+      {/* Availability */}
       <div className="flex flex-col gap-y-1">
         <h3 className="text-xl mb-2">Availability</h3>
         <div className="form-control">
@@ -99,6 +134,8 @@ const Filters = () => {
       </div>
 
       <div className="divider"></div>
+
+      {/* Price Filter */}
       <div className="flex flex-col gap-y-1">
         <h3 className="text-xl mb-2">Price</h3>
         <div>
@@ -125,6 +162,7 @@ const Filters = () => {
 
       <div className="divider"></div>
 
+      {/* Rating Filter */}
       <div>
         <h3 className="text-xl mb-2">Minimum Rating:</h3>
         <input
