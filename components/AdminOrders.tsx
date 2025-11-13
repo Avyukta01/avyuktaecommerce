@@ -6,8 +6,17 @@ import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import Link from "next/link";
+<<<<<<< HEAD
 
 type Order = {
+=======
+import toast from "react-hot-toast";
+import CustomButton from "@/components/CustomButton";
+import apiClient from "@/lib/api";
+import '../components/styles/buttonstyle.css';
+
+interface Order {
+>>>>>>> 99d880e5a73f140f7e839a7f6022f0cbd732e196
   id: number;
   name: string;
   country: string;
@@ -329,6 +338,7 @@ const AdminOrders = () => {
                   <td className="px-4 py-3  border-r border-gray-300"><div className="h-8 w-20 bg-gray-200 rounded"></div></td>
                 </tr>
               ))
+<<<<<<< HEAD
             ) : pageData.length === 0 ? (
               <tr><td colSpan={visibleKeys.length + 1} className="text-center py-12 text-gray-500 font-medium">No orders found</td></tr>
             ) : (
@@ -368,6 +378,91 @@ const AdminOrders = () => {
                   )}
                   <td className="px-4 py-3  border-r border-gray-300 text-sm">
                     <Link href={`/admin/orders/${order.id}`} className="text-blue-600 hover:text-blue-800 hover:underline font-medium">
+=======
+            ) : currentOrders.length > 0 ? (
+              currentOrders.map((order) => (
+                <tr key={order.id} className="hover:bg-blue-50 transition-colors">
+                  <td className="px-6 py-4 border-r border-gray-200">
+                    <input type="checkbox" className="rounded border-gray-300 cursor-pointer" />
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-semibold">
+                    #{order.id}
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm">
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900">{order.name}</span>
+                      <span className="text-xs text-gray-500">{order.country}</span>
+                    </div>
+                  </td>
+                  {/* <td className="px-6 py-4 border-r border-gray-200">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
+                        order.status === "Delivered"
+                          ? "bg-green-100 text-green-800"
+                          : order.status === "Pending"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                      }`}
+                    >
+                      {order.status}
+                    </span>
+                  </td> */}
+
+                            <td className="px-6 py-4 border-r border-gray-200">
+  <select
+    value={order.status.toLowerCase()}
+    onChange={async (e) => {
+      const newStatus = e.target.value;
+      try {
+        const res = await apiClient.put(`/api/orders/${order.id}`, {
+          ...order,
+          status: newStatus,
+        });
+
+        if (res.ok) {
+          toast.success(`Order #${order.id} status updated to ${newStatus}`);
+          fetchOrders(); // Refresh the table to show updated status
+        } else {
+          toast.error("Failed to update status");
+        }
+      } catch (err) {
+        console.error("Status update failed:", err);
+        toast.error("Error updating status");
+      }
+    }}
+    className={`border border-gray-300 rounded-md px-2 py-1 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      order.status === "delivered"
+        ? "bg-green-100 text-green-700"
+        : order.status === "cancelled"
+        ? "bg-red-100 text-red-700"
+        : order.status === "pending"
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-blue-100 text-blue-700"
+    }`}
+  >
+    <option value="pending">Pending</option>
+    <option value="processing">Processing</option>
+    <option value="shipped">Shipped</option>
+    <option value="delivered">Delivered</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+</td>
+
+
+
+
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-semibold">
+                    ₹{order.total.toLocaleString()}
+                  </td>
+                  <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-700">
+                    {new Date(order.dateTime).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4">
+                    <Link
+                      href={`/admin/orders/${order.id}`}
+                      className="text-blue-600 hover:text-blue-800 hover:underline text-sm font-medium transition-colors"
+                    >
+>>>>>>> 99d880e5a73f140f7e839a7f6022f0cbd732e196
                       View Details
                     </Link>
                   </td>

@@ -18,7 +18,7 @@ const SortBy = () => {
 
   return (
     <div className="flex items-center gap-x-5 max-lg:flex-col max-lg:w-full max-lg:items-start">
-      <h3 className="text-xl">Sort by:</h3>
+      {/* <h3 className="text-xl">Sort by:</h3>
       <select
         defaultValue={sortBy}
         onChange={(e) => changeSortBy(e.target.value)}
@@ -30,7 +30,7 @@ const SortBy = () => {
         <option value="titleDesc">Sort Z-A</option>
         <option value="lowPrice">Lowest Price</option>
         <option value="highPrice">Highest Price</option>
-      </select>
+      </select> */}
     </div>
   );
 };
