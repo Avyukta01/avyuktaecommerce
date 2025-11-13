@@ -4,6 +4,7 @@ import FacebookProvider from "next-auth/providers/facebook";
 import bcrypt from "bcryptjs";
 import prisma from "@/utils/db";
 import { nanoid } from "nanoid";
+
 import type { NextAuthOptions } from "next-auth"; // ✅ Correct import for v4+
 import type { User as AuthUser } from "next-auth";
 
@@ -12,6 +13,7 @@ interface JWT {
   id?: string;
   iat?: number;
   [key: string]: any;
+
 }
 
 interface Session {

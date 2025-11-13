@@ -84635,3 +84635,6 @@
 ::1 - - [06/Nov/2025:06:13:13 +0000] "POST /api/bulk-upload HTTP/1.1" 400 80 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" reqId=EZeSimP9 userId=anonymous
 ::1 - - [06/Nov/2025:06:13:22 +0000] "POST /api/bulk-upload HTTP/1.1" 400 80 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36" reqId=488X4qm6 userId=anonymous
 >>>>>>> Stashed changes
+::1 - - [13/Nov/2025:11:35:24 +0000] "GET /api/websiteimage/section/hero HTTP/1.1" 404 50 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=x7jqatRc userId=anonymous
+::ffff:127.0.0.1 - - [13/Nov/2025:11:35:24 +0000] "GET /api/categories HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=7_evbU_3 userId=anonymous
+::1 - - [13/Nov/2025:11:35:25 +0000] "GET /api/products HTTP/1.1" 500 97 "http://localhost:3000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36" reqId=KOxUurEm userId=anonymous

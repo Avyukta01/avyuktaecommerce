@@ -4,7 +4,7 @@
  */
 
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/authOptions";;
+import { authOptions } from "@/lib/authOptions";
 import { redirect } from "next/navigation";
 import type { UserRole } from "@/types/auth";
 
