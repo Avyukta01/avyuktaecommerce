@@ -28,6 +28,54 @@ const CheckoutPage = () => {
   const { products, total, clearCart } = useProductStore();
   const router = useRouter();
 
+
+const [totalDiscount, setTotalDiscount] = useState<number>(0);
+
+
+const fetchDiscountFromBackend = async () => {
+  try {
+    let totalDisc = 0;
+
+    for (const product of products) {
+      const res = await fetch(`/api/product-discounts/${product.id}`);
+      const data = await res.json();
+
+      const quantity = Number(product.amount) || 0; // use amount from store
+      let discountPercent = 0;
+
+      if (Array.isArray(data)) {
+        for (const slab of data) {
+          if (
+            quantity >= Number(slab.minQuantity) &&
+            quantity <= Number(slab.maxQuantity)
+          ) {
+            discountPercent = Number(slab.discountPercent);
+            break;
+          }
+        }
+      }
+
+      // discount formula = price × quantity × %
+      const discountAmount =
+        (Number(product.price) * quantity * discountPercent) / 100;
+      totalDisc += discountAmount;
+    }
+
+    setTotalDiscount(totalDisc);
+  } catch (error) {
+    console.error("❌ Error fetching discounts:", error);
+    setTotalDiscount(0);
+  }
+};
+
+// ✅ Auto-fetch discount when products change
+useEffect(() => {
+  if (products.length > 0) fetchDiscountFromBackend();
+  else setTotalDiscount(0);
+}, [products]);
+
+
+
   // Add validation functions that match server requirements
   const validateForm = () => {
     const errors: string[] = [];
@@ -262,9 +310,9 @@ const CheckoutPage = () => {
       }
       
       toast.success("Order created successfully! You will be contacted for payment.");
-      setTimeout(() => {
-        router.push("/");
-      }, 1000);
+     setTimeout(() => {
+  router.push(`/Orderstatus`);
+}, 500);
     } catch (error: any) {
       console.error("💥 Error in makePurchase:", error);
       
@@ -384,25 +432,31 @@ const CheckoutPage = () => {
             </ul>
 
             <dl className="hidden space-y-6 border-t border-gray-200 pt-6 text-sm font-medium text-gray-900 lg:block">
-              <div className="flex items-center justify-between">
-                <dt className="text-gray-600">Subtotal</dt>
-                <dd>{total}</dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-gray-600">Shipping</dt>
-                <dd>5</dd>
-              </div>
-              <div className="flex items-center justify-between">
-                <dt className="text-gray-600">Discount</dt>
-                <dd>{total / 5}</dd>
-              </div>
-              <div className="flex items-center justify-between border-t border-gray-200 pt-6">
-                <dt className="text-base">Total</dt>
-                <dd className="text-base">
-                  {total === 0 ? 0 : Math.round(total + total / 5 + 5)}
-                </dd>
-              </div>
-            </dl>
+  <div className="flex items-center justify-between">
+    <dt className="text-gray-600">Subtotal</dt>
+    <dd>₹{total.toFixed(2)}</dd>
+  </div>
+
+  {/* <div className="flex items-center justify-between">
+    <dt className="text-gray-600">Shipping</dt>
+    <dd>₹5</dd>
+  </div> */}
+
+  <div className="flex items-center justify-between">
+    <dt className="text-gray-600">Discount </dt>
+    <dd className="text-green-600 font-medium">
+      -₹{totalDiscount.toFixed(2)}
+    </dd>
+  </div>
+
+  <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+    <dt className="text-base">Total</dt>
+    <dd className="text-base">
+      ₹{Math.round(total - totalDiscount )}
+    </dd>
+  </div>
+</dl>
+
 
  <div className="border-t pt-6 flex justify-end">
       <button
@@ -699,16 +753,7 @@ const CheckoutPage = () => {
     </section>
 
     {/* 🟡 Submit Button */}
-    <div className="border-t pt-6 flex justify-end">
-      <button
-        type="button"
-        onClick={makePurchase}
-        disabled={isSubmitting}
-        className="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-10 py-3 rounded-lg transition disabled:bg-gray-400"
-      >
-        {isSubmitting ? "Processing Order..." : "Place Order"}
-      </button>
-    </div>
+   
   </div>
 </form>
 

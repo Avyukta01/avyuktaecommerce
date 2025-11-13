@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
-
+import toast from "react-hot-toast";
 import CustomButton from "@/components/CustomButton";
 import apiClient from "@/lib/api";
 import '../components/styles/buttonstyle.css';
@@ -295,7 +295,7 @@ const AdminOrders = () => {
                       <span className="text-xs text-gray-500">{order.country}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 border-r border-gray-200">
+                  {/* <td className="px-6 py-4 border-r border-gray-200">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold inline-block ${
                         order.status === "Delivered"
@@ -307,7 +307,51 @@ const AdminOrders = () => {
                     >
                       {order.status}
                     </span>
-                  </td>
+                  </td> */}
+
+                            <td className="px-6 py-4 border-r border-gray-200">
+  <select
+    value={order.status.toLowerCase()}
+    onChange={async (e) => {
+      const newStatus = e.target.value;
+      try {
+        const res = await apiClient.put(`/api/orders/${order.id}`, {
+          ...order,
+          status: newStatus,
+        });
+
+        if (res.ok) {
+          toast.success(`Order #${order.id} status updated to ${newStatus}`);
+          fetchOrders(); // Refresh the table to show updated status
+        } else {
+          toast.error("Failed to update status");
+        }
+      } catch (err) {
+        console.error("Status update failed:", err);
+        toast.error("Error updating status");
+      }
+    }}
+    className={`border border-gray-300 rounded-md px-2 py-1 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+      order.status === "delivered"
+        ? "bg-green-100 text-green-700"
+        : order.status === "cancelled"
+        ? "bg-red-100 text-red-700"
+        : order.status === "pending"
+        ? "bg-yellow-100 text-yellow-700"
+        : "bg-blue-100 text-blue-700"
+    }`}
+  >
+    <option value="pending">Pending</option>
+    <option value="processing">Processing</option>
+    <option value="shipped">Shipped</option>
+    <option value="delivered">Delivered</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+</td>
+
+
+
+
                   <td className="px-6 py-4 border-r border-gray-200 text-sm text-gray-900 font-semibold">
                     ₹{order.total.toLocaleString()}
                   </td>

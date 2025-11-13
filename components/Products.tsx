@@ -36,7 +36,20 @@ const Products = () => {
         }
 
         const data = await res.json();
-        setProducts(Array.isArray(data) ? data : []);
+
+// ✅ Frontend-only filtering (if backend doesn’t support category filter)
+let filtered = Array.isArray(data) ? data : [];
+
+if (category) {
+  filtered = filtered.filter(
+    (p) =>
+      p.category?.name?.toLowerCase() === category.toLowerCase() ||
+      p.category?.slug?.toLowerCase() === category.toLowerCase()
+  );
+}
+
+setProducts(filtered);
+
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]);

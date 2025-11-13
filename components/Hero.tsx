@@ -1,12 +1,49 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import bgImage from "@/public/custom/backgrounglandingpage.png";
-import { useRouter } from "next/navigation"; // ✅ add this at the top
+import { useRouter } from "next/navigation";
+
+type HeroData = {
+  title: string;
+  description?: string;
+  imageUrl: string;
+};
 
 const Hero = () => {
+  const router = useRouter();
+  const [heroData, setHeroData] = useState<HeroData | null>(null);
 
-  const router = useRouter(); // ✅ add this inside your component before return()
+  // ✅ Fetch data from backend
+  useEffect(() => {
+    const fetchHeroData = async () => {
+      try {
+        const res = await fetch("http://localhost:3001/api/websiteimage/section/hero");
+        if (!res.ok) throw new Error("Failed to fetch hero data");
+
+        const data = await res.json();
+        if (data.success && data.data && data.data.length > 0) {
+          const hero = data.data[0];
+          setHeroData({
+            title: hero.title || "",
+            description: hero.description || "",
+            imageUrl: hero.imageUrl ? `http://localhost:3001${hero.imageUrl}` : "",
+          });
+        }
+      } catch (error) {
+        console.error("❌ Error fetching hero data:", error);
+      }
+    };
+
+    fetchHeroData();
+  }, []);
+
+  // ✅ Fallback (if DB empty or error)
+  const title = heroData?.title || "Smart Choices, Better Living";
+  const description =
+    heroData?.description ||
+    "Discover trending products curated just for you. Shop smarter and enjoy exclusive deals on electronics, lifestyle, and fashion — all in one place.";
+  const backgroundImage = heroData?.imageUrl || bgImage;
 
   return (
     <section
@@ -22,10 +59,10 @@ const Hero = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* Background Image */}
+      {/* ✅ Background (Dynamic or Static) */}
       <Image
-        src={bgImage}
-        alt="Ecommerce Background"
+        src={backgroundImage}
+        alt="Hero Background"
         fill
         priority
         style={{
@@ -47,35 +84,6 @@ const Hero = () => {
           background:
             "linear-gradient(to bottom, rgba(255,255,255,0.4), rgba(230,245,255,0.4))",
           zIndex: -9,
-        }}
-      ></div>
-
-      {/* Glowing Blobs */}
-      <div
-        style={{
-          position: "absolute",
-          top: "15%",
-          left: "10%",
-          width: "250px",
-          height: "250px",
-          background: "rgba(180,220,255,0.4)",
-          borderRadius: "50%",
-          filter: "blur(120px)",
-          animation: "blobMove 8s infinite alternate ease-in-out",
-        }}
-      ></div>
-
-      <div
-        style={{
-          position: "absolute",
-          bottom: "10%",
-          right: "10%",
-          width: "300px",
-          height: "300px",
-          background: "rgba(200,220,255,0.5)",
-          borderRadius: "50%",
-          filter: "blur(120px)",
-          animation: "blobMove2 10s infinite alternate ease-in-out",
         }}
       ></div>
 
@@ -111,7 +119,7 @@ const Hero = () => {
               marginBottom: "20px",
             }}
           >
-            Smart Choices, Better Living
+            {title}
           </h1>
 
           <p
@@ -123,67 +131,54 @@ const Hero = () => {
               marginBottom: "30px",
             }}
           >
-            Discover trending products curated just for you. Shop smarter and enjoy exclusive deals
-            on electronics, lifestyle, and fashion — all in one place.
+            {description}
           </p>
 
+          {/* Buttons */}
           <div
-  style={{
-    display: "flex",
-    gap: "20px",
-    flexWrap: "wrap",
-  }}
->
-  <button
-    style={{
-      backgroundColor: "#111",
-      color: "#fff",
-      fontWeight: "600",
-      padding: "14px 40px",
-      borderRadius: "12px",
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-      boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-    }}
-    onMouseEnter={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#333";
-    }}
-    onMouseLeave={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#111";
-    }}
-    onClick={() => router.push("/shop")} 
-   
-   >
-    Shop Now
-  </button>
+            style={{
+              display: "flex",
+              gap: "20px",
+              flexWrap: "wrap",
+            }}
+          >
+            <button
+              style={{
+                backgroundColor: "#111",
+                color: "#fff",
+                fontWeight: "600",
+                padding: "14px 40px",
+                borderRadius: "12px",
+                border: "none",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              }}
+              onClick={() => router.push("/shop")}
+            >
+              Shop Now
+            </button>
 
-  <button
-    style={{
-      backgroundColor: "transparent",
-      color: "#111",
-      fontWeight: "600",
-      padding: "14px 40px",
-      borderRadius: "12px",
-      border: "2px solid #111",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-    }}
-    onMouseEnter={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#f3f3f3";
-    }}
-    onMouseLeave={(e) => {
-      (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
-    }}
-  >
-    View Offers
-  </button>
-</div>
-
+            <button
+              style={{
+                backgroundColor: "transparent",
+                color: "#111",
+                fontWeight: "600",
+                padding: "14px 40px",
+                borderRadius: "12px",
+                border: "2px solid #111",
+                cursor: "pointer",
+                transition: "all 0.3s ease",
+              }}
+              onClick={() => router.push("/offers")}
+            >
+              View Offers
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Inline Animations */}
+      {/* Animations */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -196,24 +191,6 @@ const Hero = () => {
           }
         }
 
-        @keyframes blobMove {
-          0% {
-            transform: translate(0, 0);
-          }
-          100% {
-            transform: translate(60px, -40px);
-          }
-        }
-
-        @keyframes blobMove2 {
-          0% {
-            transform: translate(0, 0);
-          }
-          100% {
-            transform: translate(-40px, 50px);
-          }
-        }
-
         @keyframes slideInLeft {
           from {
             opacity: 0;
@@ -222,18 +199,6 @@ const Hero = () => {
           to {
             opacity: 1;
             transform: translateX(0);
-          }
-        }
-
-        @media (max-width: 768px) {
-          section {
-            padding: 60px 16px;
-          }
-          div {
-            text-align: center !important;
-          }
-          button {
-            width: 100%;
           }
         }
       `}</style>

@@ -4,8 +4,8 @@ const { asyncHandler, AppError } = require("../utills/errorHandler");
 
 const createOrderProduct = asyncHandler(async (request, response) => {
   const { customerOrderId, productId, quantity } = request.body;
-  
-  // Validate required fields
+
+  // 1️⃣ Validate fields
   if (!customerOrderId) {
     throw new AppError("Customer order ID is required", 400);
   }
@@ -16,35 +16,61 @@ const createOrderProduct = asyncHandler(async (request, response) => {
     throw new AppError("Valid quantity is required", 400);
   }
 
-  // Verify that the customer order exists
+  // 2️⃣ Check if order exists
   const existingOrder = await prisma.customer_order.findUnique({
-    where: { id: customerOrderId }
+    where: { id: customerOrderId },
   });
-
   if (!existingOrder) {
     throw new AppError("Customer order not found", 404);
   }
 
-  // Verify that the product exists
+  // 3️⃣ Check if product exists
   const existingProduct = await prisma.product.findUnique({
-    where: { id: productId }
+    where: { id: productId },
   });
-
   if (!existingProduct) {
     throw new AppError("Product not found", 404);
   }
 
-  // Create the order product
-  const orderProduct = await prisma.customer_order_product.create({
-    data: {
-      customerOrderId: customerOrderId,
-      productId: productId,
-      quantity: parseInt(quantity)
-    }
+  // 4️⃣ Check available stock before adding
+  if (existingProduct.inStock < quantity) {
+    throw new AppError(
+      `Not enough stock for ${existingProduct.title}. Only ${existingProduct.inStock} left.`,
+      400
+    );
+  }
+
+  // ✅ 5️⃣ Create order-product and update stock together (atomic transaction)
+  const result = await prisma.$transaction(async (tx) => {
+    // Create the order-product link
+    const orderProduct = await tx.customer_order_product.create({
+      data: {
+        customerOrderId,
+        productId,
+        quantity: parseInt(quantity),
+      },
+    });
+
+    // Update stock
+    await tx.product.update({
+      where: { id: productId },
+      data: {
+        inStock: {
+          decrement: parseInt(quantity),
+        },
+      },
+    });
+
+    return orderProduct;
   });
 
-  return response.status(201).json(orderProduct);
+  return response.status(201).json({
+    success: true,
+    message: "Product added to order and stock updated successfully",
+    data: result,
+  });
 });
+
 
 const updateProductOrder = asyncHandler(async (request, response) => {
   const { id } = request.params;
