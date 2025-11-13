@@ -63,35 +63,7 @@ const InventoryDashboard = () => {
     return () => clearTimeout(t);
   }, [searchInput]);
 
-  // Fetch
-// Fetch
-// useEffect(() => {
-//   (async () => {
-//     try {
-//       setLoading(true);
-
-//       // FIX #1 → remove leading slash
-//       const res = await apiClient.get("/api/inventory");
-
-//       // FIX #2 → check response OK
-//       if (!res.ok) {
-//         console.error("API error:", res.status, res.statusText);
-//         setRows([]);
-//         return;
-//       }
-
-//       // FIX #3 → parse JSON correctly
-//       const data = await res.json();
-
-//       setRows(Array.isArray(data) ? data : []);
-//     } catch (err) {
-//       console.error("Fetch error:", err);
-//       setRows([]);
-//     } finally {
-//       setLoading(false);
-//     }
-//   })();
-// }, []);
+ 
 
 
   useEffect(() => {

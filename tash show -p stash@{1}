@@ -1,0 +1,191 @@
+[1mdiff --git a/app/(Dashboard2)/super-admin/categories/page.tsx b/app/(Dashboard2)/super-admin/categories/page.tsx[m
+[1mindex 62e0770..27cf4c6 100644[m
+[1m--- a/app/(Dashboard2)/super-admin/categories/page.tsx[m
+[1m+++ b/app/(Dashboard2)/super-admin/categories/page.tsx[m
+[36m@@ -1,263 +1,305 @@[m
+ "use client";[m
+[31m-import { CustomButton } from "@/components";[m
+[31m-import { nanoid } from "nanoid";[m
+[32m+[m
+[32m+[m[32mimport React, { useEffect, useMemo, useState } from "react";[m
+[32m+[m[32mimport apiClient from "@/lib/api";[m
+[32m+[m[32mimport * as XLSX from "xlsx";[m
+[32m+[m[32mimport jsPDF from "jspdf";[m
+[32m+[m[32mimport "jspdf-autotable";[m
+ import Link from "next/link";[m
+[31m-import React, { useEffect, useState, useCallback, useMemo } from "react";[m
+ import { formatCategoryName } from "../../../../utils/categoryFormating";[m
+[31m-import apiClient from "@/lib/api";[m
+[31m-[m
+[31m-import { Home, Category } from "@mui/icons-material";[m
+ [m
+[31m-[m
+[31m-interface Category {[m
+[32m+[m[32mtype Category = {[m
+   id: number;[m
+   name: string;[m
+[31m-}[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mtype ColKey = "id" | "name";[m
+ [m
+ const DashboardCategory = () => {[m
+   const [categories, setCategories] = useState<Category[]>([]);[m
+[31m-  const [searchTerm, setSearchTerm] = useState<string>("");[m
+[31m-  const [currentPage, setCurrentPage] = useState<number>(1);[m
+[31m-  const [isLoading, setIsLoading] = useState<boolean>(true);[m
+[31m- const [itemsPerPage, setItemsPerPage] = useState<number>(5);[m
+[32m+[m[32m  const [loading, setLoading] = useState(true);[m
+ [m
+[31m-  [m
+[32m+[m[32m  const [sortCol, setSortCol] = useState<ColKey | null>(null);[m
+[32m+[m[32m  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");[m
+[32m+[m
+[32m+[m[32m  const [globalSearch, setGlobalSearch] = useState("");[m
+[32m+[m[32m  const [searchInput, setSearchInput] = useState("");[m
+[32m+[m
+[32m+[m[32m  const [filters, setFilters] = useState<Record<ColKey, string>>({[m
+[32m+[m[32m    id: "", name: ""[m
+[32m+[m[32m  });[m
+[32m+[m
+[32m+[m[32m  const [visible, setVisible] = useState<Record<ColKey, boolean>>({[m
+[32m+[m[32m    id: true, name: true[m
+[32m+[m[32m  });[m
+[32m+[m[32m  const [colMenuOpen, setColMenuOpen] = useState(false);[m
+[32m+[m
+[32m+[m[32m  const [page, setPage] = useState(1);[m
+[32m+[m[32m  const [perPage, setPerPage] = useState(10);[m
+[32m+[m
+[32m+[m[32m  // Debounce Search[m
+   useEffect(() => {[m
+[32m+[m[32m    const t = setTimeout(() => setGlobalSearch(searchInput), 300);[m
+[32m+[m[32m    return () => clearTimeout(t);[m
+[32m+[m[32m  }, [searchInput]);[m
+ [m
+[31m-    apiClient[m
+[31m-      .get("/api/categories")[m
+[31m-[m
+[31m-    apiClient.get("/api/categories")[m
+[31m-[m
+[31m-      .then((res) => {[m
+[31m-        if (!res.ok) {[m
+[31m-          throw new Error("Failed to fetch categories");[m
+[31m-        }[m
+[31m-        return res.json();[m
+[31m-      })[m
+[31m-      .then((data) => {[m
+[31m-        setCategories(data);[m
+[31m-      })[m
+[31m-      .catch((err) => {[m
+[31m-        console.error("Error fetching categories:", err);[m
+[31m-      })[m
+[31m-      .finally(() => setIsLoading(false));[m
+[32m+[m[32m  // Fetch Categories[m
+[32m+[m[32m  useEffect(() => {[m
+[32m+[m[32m    (async () => {[m
+[32m+[m[32m      try {[m
+[32m+[m[32m        setLoading(true);[m
+[32m+[m[32m        const res = await apiClient.get("/api/categories");[m
+[32m+[m[32m        if (!res.ok) throw new Error("Failed");[m
+[32m+[m[32m        const data = await res.json();[m
+[32m+[m[32m        setCategories(data || []);[m
+[32m+[m[32m      } catch (err) {[m
+[32m+[m[32m        console.error("Error:", err);[m
+[32m+[m[32m      } finally {[m
+[32m+[m[32m        setLoading(false);[m
+[32m+[m[32m      }[m
+[32m+[m[32m    })();[m
+   }, []);[m
+ [m
+[31m-  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {[m
+[31m-    const value = e.target.value;[m
+[31m-    setSearchTerm(value);[m
+[31m-    setCurrentPage(1);[m
+[31m-  }, []);[m
+[32m+[m[32m  // Process Data[m
+[32m+[m[32m  const processed = useMemo(() => {[m
+[32m+[m[32m    let d = [...categories];[m
+ [m
+[31m-  const filteredCategories = useMemo(() => {[m
+[31m-    if (!categories) return [];[m
+[31m-    if (!searchTerm) return categories;[m
+[31m-    [m
+[31m-    return categories.filter((category) =>[m
+[31m-      formatCategoryName(category?.name)[m
+[31m-        ?.toLowerCase()[m
+[31m-        .includes(searchTerm.toLowerCase())[m
+[31m-    );[m
+[31m-  }, [categories, searchTerm]);[m
+[31m-[m
+[31m-  const indexOfLastItem = currentPage * itemsPerPage;[m
+[31m-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;[m
+[31m-  const currentCategories = filteredCategories.slice([m
+[31m-    indexOfFirstItem,[m
+[31m-    indexOfLastItem[m
+[31m-  );[m
+[31m-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);[m
+[31m-[m
+[31m-  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);[m
+[31m-[m
+[31m-  // CSV Download[m
+[31m-  const handleDownload = () => {[m
+[31m-    const headers = "ID,Category Name\n";[m
+[31m-    const rows = filteredCategories[m
+[31m-      .map((c) => `${c.id},"${formatCategoryName(c?.name)}"`)[m
+[31m-      .join("\n");[m
+[31m-    const csvContent =[m
+[31m-      "data:text/csv;charset=utf-8," + encodeURIComponent(headers + rows);[m
+[31m-[m
+[31m-    const link = document.createElement("a");[m
+[31m-    link.href = csvContent;[m
+[31m-    link.download = "categories-table.csv";[m
+[31m-    link.click();[m
+[32m+[m[32m    // Filters[m
+[32m+[m[32m    d = d.filter(c => {[m
+[32m+[m[32m      const id = c.id.toString().includes(filters.id);[m
+[32m+[m[32m      const name = formatCategoryName(c.name)?.toLowerCase().includes(filters.name.toLowerCase());[m
+[32m+[m[32m      return id && name;[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32m    // Global Search[m
+[32m+[m[32m    if (globalSearch) {[m
+[32m+[m[32m      const q = globalSearch.toLowerCase();[m
+[32m+[m[32m      d = d.filter(c =>[m
+[32m+[m[32m        c.id.toString().includes(q) ||[m
+[32m+[m[32m        formatCategoryName(c.name)?.toLowerCase().includes(q)[m
+[32m+[m[32m      );[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    // Sort[m
+[32m+[m[32m    if (sortCol) {[m
+[32m+[m[32m      d.sort((a, b) => {[m
+[32m+[m[32m        let A: any = a[sortCol];[m
+[32m+[m[32m        let B: any = b[sortCol];[m
+[32m+[m[32m        if (sortCol === "id") { A = Number(A); B = Number(B); }[m
+[32m+[m[32m        else { A = formatCategoryName(A)?.toLowerCase(); B = formatCategoryName(B)?.toLowerCase(); }[m
+[32m+[m[32m        return (A < B ? -1 : A > B ? 1 : 0) * (sortDir === "asc" ? 1 : -1);[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+[32m+[m[32m    return d;[m
+[32m+[m[32m  }, [categories, filters, globalSearch, sortCol, sortDir]);[m
+[32m+[m
+[32m+[m[32m  const total = processed.length;[m
+[32m+[m[32m  const pageCount = Math.max(1, Math.ceil(total / perPage));[m
+[32m+[m[32m  const pageData = useMemo(() => processed.slice((page - 1) * perPage, page * perPage), [processed, page, perPage]);[m
+[32m+[m
+[32m+[m[32m  const toggleSort = (c: ColKey) => {[m
+[32m+[m[32m    if (sortCol === c) setSortDir(p => p === "asc" ? "desc" : "asc");[m
+[32m+[m[32m    else { setSortCol(c); setSortDir("asc"); }[m
+   };[m
+ [m
+[31m-  // Refresh Handler[m
+[31m-  const handleRefresh = () => {[m
+[31m-    setIsLoading(true);[m
+[31m-    apiClient[m
+[31m-      .get("/api/categories")[m
+[31m-      .then((res) => res.json())[m
+[31m-      .then((data) => setCategories(data))[m
+[31m-      .catch((err) => console.error("Error fetching categories:", err))[m
+[31m-      .finally(() => setIsLoading(false));[m
+[32m+[m[32m  const arrow = (c: ColKey) =>[m
+[32m+[m[32m    sortCol !== c ? <span className="opa

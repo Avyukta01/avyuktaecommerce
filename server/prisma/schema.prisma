@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -129,6 +130,7 @@ model product {
   videos         product_video[]
   discounts      product_discount[]
   bulk_upload_items bulk_upload_item[]         // ✅ added relation for discount
+  inventory      inventory?               
 
   @@index([categoryId])
   @@index([merchantId])
@@ -387,4 +389,21 @@ model bulk_upload_item {
   @@index([categoryId])
   @@index([productId])
   @@index([status])
+}
+
+
+/**
+ * ----------------------------- Inventory -----------------------------
+ * Track product stock (without warehouse)
+ */
+model inventory {
+  id            String   @id @default(uuid())
+  productId     String   @unique // 1 product = 1 inventory record
+  totalStock    Int      @default(0)  // Total ever received
+  currentStock  Int      @default(0)  // Stock currently available
+  reservedStock Int      @default(0)  // Pending orders stock
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+
+  product product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
