@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";;
 import 'svgmap/dist/svgMap.min.css';
 import SessionProvider from "@/utils/SessionProvider";
 import Header from "@/components/Header";
