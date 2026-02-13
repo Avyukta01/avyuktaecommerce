@@ -89,11 +89,11 @@ model notification {
   id        String                @id @default(uuid())
   userId    String
   title     String
-  message   String                @db.Text
+  message   String                
   type      notification_type
   isRead    Boolean               @default(false)
   priority  notification_priority @default(NORMAL)
-  metadata  String?               @db.LongText
+  metadata  String?               
   createdAt DateTime              @default(now())
   updatedAt DateTime              @default(now()) @updatedAt
 
